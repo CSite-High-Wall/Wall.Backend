@@ -4,6 +4,8 @@ import (
 	"context"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
+
+	"github.com/google/uuid"
 )
 
 type ReviewService struct {
@@ -33,4 +35,11 @@ func (service ReviewService) Delete(requestBody model.ReviewDeleteRequestJsonObj
 
 func (service ReviewService) FindPostByPostId(expressionId uint) (model.Review, error) {
 	return d.FindPostByPostId(ctx, expressionId)
+}
+
+func (service ReviewService) FindReviewByReviewId(id uint) (model.Review, error) {
+	return d.FindReviewByReviewId(ctx, id)
+}
+func (service ReviewService) FindReviewByUserId(userId uuid.UUID, id uint) (model.Review, error) {
+	return d.FindReviewByUserId(ctx, userId, id)
 }

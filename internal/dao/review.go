@@ -40,9 +40,23 @@ func (dao ReviewDao) DeleteReview(ctx context.Context, UserId uuid.UUID, ReviewI
 	return err
 }
 
-func (dao ReviewDao) FindPostByPostId(ctx context.Context, expressionId uint) (model.Review, error) {
+func (dao ReviewDao) FindPostByPostId(ctx context.Context, ExpressionId uint) (model.Review, error) {
 	var review model.Review
-	result := dao.db.First(&review, "expression_id = ?", expressionId)
+	result := dao.db.First(&review, "expression_id = ?", ExpressionId)
+
+	return review, result.Error
+}
+
+func (dao ReviewDao) FindReviewByReviewId(ctx context.Context, ReviewId uint) (model.Review, error) {
+	var review model.Review
+	result := dao.db.First(&review, "review_id = ?", ReviewId)
+
+	return review, result.Error
+}
+
+func (dao ReviewDao) FindReviewByUserId(ctx context.Context, UserId uuid.UUID, ReviewId uint) (model.Review, error) {
+	var review model.Review
+	result := dao.db.First(&review, "user_id = ? AND review_id = ?", UserId, ReviewId)
 
 	return review, result.Error
 }

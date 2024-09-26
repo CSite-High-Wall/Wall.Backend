@@ -40,18 +40,35 @@ func (controller ReviewController) Publish(c *gin.Context) {
 
 func (controller ReviewController) Delete(c *gin.Context) {
 	var requestBody model.ReviewDeleteRequestJsonObject
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
+	if err := c.BindJSON(&requestBody); err != nil {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
 	}
+	_, err := controller.reviewService.FindReviewByReviewId(requestBody.ID)
+	if err != nil {
+		utils.ResponseFailWithoutData(c, "评论不存在")
+		return
+	}
+	_, err = controller.reviewService.FindReviewByUserId(requestBody.UserId, requestBody.ID)
+	if err != nil {
+		utils.ResponseFailWithoutData(c, "不是本人操作")
+		return
+	}
+	utils.ResponseOkWithoutData(c)
 
 }
 
 func (controller ReviewController) Edit(c *gin.Context) {
 	var requestBody model.ReviewUpdateRequestJsonObject
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
+	if err := c.BindJSON(&requestBody); err != nil {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
 	}
+	_, err := controller.reviewService.FindReviewByReviewId(requestBody.ID)
+	if err != nil {
+		utils.ResponseFailWithoutData(c, "评论不存在")
+		return
+	}
+	utils.ResponseOkWithoutData(c)
 
 }
