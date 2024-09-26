@@ -8,6 +8,7 @@ import (
 
 func InitRoute(r *gin.Engine) {
 
+	r.Use(middleware.CorsHandler)
 	r.NoMethod(middleware.NotFoundHandler)
 	r.NoRoute(middleware.NotFoundHandler)
 
