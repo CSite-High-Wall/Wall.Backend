@@ -23,12 +23,13 @@ type ReviewCreateRequestJsonObject struct {
 	Content      string    `json:"content"`
 }
 
+type ReviewDeleteRequestJsonObject struct {
+	UserId uuid.UUID `json:"user_id" `
+	ID     uint      `json:"review_id"`
+}
+
 type ReviewUpdateRequestJsonObject struct {
 	UserId  uuid.UUID `json:"user_id" `
 	ID      uint      `json:"review_id"`
 	Content string    `json:"content"`
-}
-type ReviewDeleteRequestJsonObject struct {
-	UserId uuid.UUID `json:"user_id" `
-	ID     uint      `json:"review_id"`
 }

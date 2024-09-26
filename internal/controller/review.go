@@ -69,6 +69,11 @@ func (controller ReviewController) Edit(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "评论不存在")
 		return
 	}
+	_, err = controller.reviewService.FindReviewByUserId(requestBody.UserId, requestBody.ID)
+	if err != nil {
+		utils.ResponseFailWithoutData(c, "不是本人操作")
+		return
+	}
 	utils.ResponseOkWithoutData(c)
 
 }

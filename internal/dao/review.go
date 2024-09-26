@@ -28,15 +28,15 @@ func (dao ReviewDao) CreateReview(ctx context.Context, UserId uuid.UUID, Express
 	return err
 }
 
+func (dao ReviewDao) DeleteReview(ctx context.Context, UserId uuid.UUID, ReviewId uint) error {
+	err := dao.db.WithContext(ctx).Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
+	return err
+}
+
 func (dao ReviewDao) UpdateReview(ctx context.Context, UserId uuid.UUID, ReviewId uint, Content string) error {
 	err := dao.db.WithContext(ctx).Model(&model.Review{}).Where("user_id=? AND review_id=?", UserId, ReviewId).Updates(map[string]interface{}{
 		"content": Content,
 	}).Error
-	return err
-}
-
-func (dao ReviewDao) DeleteReview(ctx context.Context, UserId uuid.UUID, ReviewId uint) error {
-	err := dao.db.WithContext(ctx).Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
 	return err
 }
 

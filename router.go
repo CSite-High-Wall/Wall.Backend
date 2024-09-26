@@ -31,13 +31,13 @@ func InitRoute(r *gin.Engine) {
 		// 	d.DELETE("/delete", PostController.Delete)
 		// 	d.POST("/publish", PostController.Publish)
 		// }
-		// f := api.Group("/review")
-		// {
-		// 	f.POST("/publish", ReviewController.Publish)
-		// 	f.DELETE("/delete", ReviewController.Delete)
-		// 	f.PUT("/edit", ReviewController.Edit)
-		// 	f.POST("/reply", ReviewController.Reply)
-		// }
+		f := api.Group("/review")
+		{
+			f.POST("/publish", ReviewController.Publish)
+			f.DELETE("/delete", ReviewController.Delete)
+			f.PUT("/edit", ReviewController.Edit)
+			// f.POST("/reply", ReviewController.Reply)
+		}
 		// api.POST("login", user.Login)
 
 		// c := api.Group("/contact")

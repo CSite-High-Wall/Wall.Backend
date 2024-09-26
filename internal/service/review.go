@@ -25,12 +25,12 @@ func (service ReviewService) Publish(requestBody model.ReviewCreateRequestJsonOb
 	return d.CreateReview(ctx, requestBody.UserId, requestBody.ExpressionId, requestBody.Content)
 }
 
-func (service ReviewService) Edit(requestBody model.ReviewUpdateRequestJsonObject) error {
-	return d.UpdateReview(ctx, requestBody.UserId, requestBody.ID, requestBody.Content)
-}
-
 func (service ReviewService) Delete(requestBody model.ReviewDeleteRequestJsonObject) error {
 	return d.DeleteReview(ctx, requestBody.UserId, requestBody.ID)
+}
+
+func (service ReviewService) Edit(requestBody model.ReviewUpdateRequestJsonObject) error {
+	return d.UpdateReview(ctx, requestBody.UserId, requestBody.ID, requestBody.Content)
 }
 
 func (service ReviewService) FindPostByPostId(expressionId uint) (model.Review, error) {

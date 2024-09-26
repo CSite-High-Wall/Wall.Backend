@@ -26,6 +26,7 @@ var UserDao dao.UserDao
 
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
+var ReviewController controller.ReviewController
 
 func InitComponents() {
 	ConfigService = service.NewConfigService()
