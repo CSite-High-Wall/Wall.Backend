@@ -4,31 +4,33 @@ import (
 	"context"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
-
-	"github.com/google/uuid"
 )
+
+type ReviewService struct {
+	reviewDao dao.ReviewDao
+}
+
+func NewReviewService(dao dao.ReviewDao) ReviewService {
+	return ReviewService{
+		reviewDao: dao,
+	}
+}
 
 var ctx context.Context
 var d dao.ReviewDao
 
-func CreateReview(UserId uuid.UUID, PostId uint, Content string) error {
-	re := model.Review{
-		UserId:  UserId,
-		PostId:  PostId,
-		Content: Content,
-	}
-	return d.CreateReview(ctx, re.UserId, re.PostId, re.Content)
-
+func (service ReviewService) Publish(requestBody model.ReviewCreateRequestJsonObject) error {
+	return d.CreateReview(ctx, requestBody.UserId, requestBody.ExpressionId, requestBody.Content)
 }
 
-func UpdateReview(UserId uuid.UUID, ReviewId uint, Content string) error {
-	return d.UpdateReview(ctx, UserId, ReviewId, Content)
+func (service ReviewService) Edit(requestBody model.ReviewUpdateRequestJsonObject) error {
+	return d.UpdateReview(ctx, requestBody.UserId, requestBody.ID, requestBody.Content)
 }
 
-func DeleteReview(UserId uuid.UUID, ReviewId uint) error {
-	return d.DeleteReview(ctx, UserId, ReviewId)
+func (service ReviewService) Delete(requestBody model.ReviewDeleteRequestJsonObject) error {
+	return d.DeleteReview(ctx, requestBody.UserId, requestBody.ID)
 }
 
-// func GetContactList(uid uint)([]model.Contact,error){
-// 	return d.GetContactByOwnerID(ctx,uid)
-// }
+func (service ReviewService) FindPostByPostId(expressionId uint) (model.Review, error) {
+	return d.FindPostByPostId(ctx, expressionId)
+}

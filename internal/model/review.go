@@ -2,14 +2,15 @@ package model
 
 import (
 	"github.com/google/uuid"
-	// "gorm.io/gorm"
+	"gorm.io/gorm"
 )
 
 type Review struct {
-	ID      uint      `json:"review_id"`
-	UserId  uuid.UUID `json:"user_id" gorm:"type:char(36)"`
-	PostId  uint      `json:"post_id"`
-	Content string    `json:"content"`
+	ID           uint           `json:"review_id"`
+	UserId       uuid.UUID      `json:"user_id" gorm:"type:char(36)"`
+	ExpressionId uint           `json:"expression_id"`
+	Content      string         `json:"content"`
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
 // func (review *Review) BeforeCreate(tx *gorm.DB) (err error) {
