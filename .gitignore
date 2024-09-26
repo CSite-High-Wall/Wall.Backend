@@ -1,0 +1,8 @@
+*.exe
+
+/.idea
+/.vscode
+/.vs
+
+/conf/config.yaml
+
