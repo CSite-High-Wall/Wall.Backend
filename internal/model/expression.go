@@ -19,4 +19,5 @@ type Expression struct {
 	UpdatedAt    time.Time      `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Anonymity    int            `gorm:"not null" json:"anonymity"`
+	Title        string         `gorm:"default:无" json:"title"`
 }

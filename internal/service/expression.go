@@ -21,13 +21,13 @@ var db dao.ExpressionDao
 //非匿名
 
 func (service ExpressionService) Publish1(requestBody model.ExpressionCreateRequestJsonObject) error {
-	return db.CreateExpression1(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity, requestBody.UserName)
+	return db.CreateExpression1(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity, requestBody.UserName,requestBody.Title)
 }
 
 //匿名
 
 func (service ExpressionService) Publish2(requestBody model.ExpressionCreateRequestJsonObject) error {
-	return db.CreateExpression2(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity)
+	return db.CreateExpression2(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity, requestBody.Title)
 }
 
 func (service ExpressionService) Delete(requestBody model.ExpressionDeleteRequestJsonObject) error {
@@ -35,7 +35,7 @@ func (service ExpressionService) Delete(requestBody model.ExpressionDeleteReques
 }
 
 func (service ExpressionService) Edit(requestBody model.ExpressionUpdateRequestJsonObject) error {
-	return db.UpdateExpression(ctx, requestBody.UserId, requestBody.ExpressionID, requestBody.Content)
+	return db.UpdateExpression(ctx, requestBody.UserId, requestBody.ExpressionID, requestBody.Content,requestBody.Title)
 }
 
 func (service ExpressionService) FindUserByUserId(userid uuid.UUID) (model.User, error) {

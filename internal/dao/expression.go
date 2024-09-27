@@ -21,33 +21,36 @@ func NewExpressionDao(db *gorm.DB) ExpressionDao {
 
 //创建非匿名表白
 
-func (dao ExpressionDao) CreateExpression1(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int, UserName string) error {
+func (dao ExpressionDao) CreateExpression1(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int, UserName string, Title string) error {
 	err := dao.db.WithContext(ctx).Create(&model.Expression{
 		UserID:    UserId,
 		Content:   Content,
 		Anonymity: Anonymity,
 		UserName:  UserName,
+		Title:     Title,
 	}).Error
 	return err
 }
 
 //创建匿名表白
 
-func (dao ExpressionDao) CreateExpression2(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int) error {
+func (dao ExpressionDao) CreateExpression2(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int, Title string) error {
 	err := dao.db.WithContext(ctx).Create(&model.Expression{
 		UserID:    UserId,
 		Content:   Content,
 		UserName:  "匿名",
 		Anonymity: Anonymity,
+		Title:     Title,
 	}).Error
 	return err
 }
 
 //更新表白内容
 
-func (dao ExpressionDao) UpdateExpression(ctx context.Context, UserId uuid.UUID, ExpressionId uint, Content string) error {
+func (dao ExpressionDao) UpdateExpression(ctx context.Context, UserId uuid.UUID, ExpressionId uint, Content string,Title string) error {
 	err := dao.db.WithContext(ctx).Model(&model.Expression{}).Where("user_id=? AND expression_id=?", UserId, ExpressionId).Updates(map[string]interface{}{
 		"content": Content,
+		"title":Title,
 	}).Error
 	return err
 }

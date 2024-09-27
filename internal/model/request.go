@@ -39,12 +39,14 @@ type ExpressionCreateRequestJsonObject struct {
 	Content   string    `json:"content"`
 	Anonymity int       `json:"anonymity"`
 	UserName  string    `json:"user_name"`
+	Title     string    `json:"title"`
 }
 
 type ExpressionUpdateRequestJsonObject struct {
 	UserId       uuid.UUID `json:"user_id" `
 	Content      string    `json:"content"`
 	ExpressionID uint      `json:"expression_id"`
+	Title        string    `json:"title"`
 }
 
 type ExpressionDeleteRequestJsonObject struct {
