@@ -35,5 +35,6 @@ func (service *DataBaseService) InitializeDataTable() error {
 	return service.DB.AutoMigrate(
 		model.User{},
 		model.Expression{},
+		model.Review{},
 	)
 }

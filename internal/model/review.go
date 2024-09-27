@@ -11,6 +11,7 @@ type Review struct {
 	ExpressionId uint           `json:"expression_id"`
 	Content      string         `json:"content"`
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	Time         string         `json:"time"`
 }
 
 // func (review *Review) BeforeCreate(tx *gorm.DB) (err error) {
