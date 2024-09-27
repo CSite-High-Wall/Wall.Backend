@@ -22,6 +22,7 @@ func NewAuthController(authService service.AuthService, userService service.User
 	}
 }
 
+// 登录验证接口
 func (controller AuthController) Authenticate(c *gin.Context) {
 	var requestBody model.LoginRequestJsonObject
 
@@ -47,6 +48,7 @@ func (controller AuthController) Authenticate(c *gin.Context) {
 	}
 }
 
+// 刷新令牌接口
 func (controller AuthController) Refresh(c *gin.Context) {
 	var requestBody model.AuthTokenRequestJsonObject
 
@@ -68,6 +70,7 @@ func (controller AuthController) Refresh(c *gin.Context) {
 	}
 }
 
+// 登出验证接口
 func (controller AuthController) Signout(c *gin.Context) {
 	var requestBody model.AuthTokenRequestJsonObject
 

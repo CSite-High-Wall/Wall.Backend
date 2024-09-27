@@ -18,6 +18,7 @@ func NewRegisterController(service service.UserService) RegisterController {
 	}
 }
 
+// 注册用户接口
 func (controller RegisterController) Register(c *gin.Context) {
 	var requestBody model.RegisterRequestJsonObject
 
