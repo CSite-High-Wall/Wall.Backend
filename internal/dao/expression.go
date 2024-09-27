@@ -58,3 +58,11 @@ func (dao ExpressionDao) DeleteExpression(ctx context.Context, UserId uuid.UUID,
 	err := dao.db.WithContext(ctx).Where("user_id=? AND expression_id=?", UserId, ExpressionId).Delete(&model.Expression{}).Error
 	return err
 }
+
+//查找用户是否存在
+
+func (dao ExpressionDao) FindUserByUserId(ctx context.Context, userid uuid.UUID) (model.User, error) {
+	var User model.User
+	result := dao.db.WithContext(ctx).First(&User, userid)
+	return User, result.Error
+}
