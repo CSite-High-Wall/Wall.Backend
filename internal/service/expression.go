@@ -1,12 +1,19 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
 )
 
 type ExpressionService struct {
 	expressionDao dao.ExpressionDao
+}
+
+func NewExpressionService(expressionDao dao.ExpressionDao) ExpressionService {
+	return ExpressionService{
+		expressionDao: expressionDao,
+	}
 }
 
 var db dao.ExpressionDao
@@ -29,4 +36,8 @@ func (service ExpressionService) Delete(requestBody model.ExpressionDeleteReques
 
 func (service ExpressionService) Edit(requestBody model.ExpressionUpdateRequestJsonObject) error {
 	return db.UpdateExpression(ctx, requestBody.UserId, requestBody.ExpressionID, requestBody.Content)
+}
+
+func (service ExpressionService) FindUserByUserId(userid uuid.UUID) (model.User, error) {
+	return db.FindUserByUserId(ctx, userid)
 }

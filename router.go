@@ -25,12 +25,12 @@ func InitRoute(r *gin.Engine) {
 		// {
 		// 	b.POST("/nickname/edit", UserController.Nickname)
 		// }
-		// d := api.Group("/expression")
-		// {
-		// 	d.PUT("/edit", PostController.Edit)
-		// 	d.DELETE("/delete", PostController.Delete)
-		// 	d.POST("/publish", PostController.Publish)
-		// }
+		d := api.Group("/expression")
+		{
+			d.PUT("/edit", ExpressController.Edit)
+			d.DELETE("/delete", ExpressController.Delete)
+			d.POST("/publish", ExpressController.Publish)
+		}
 		f := api.Group("/review")
 		{
 			f.POST("/publish", ReviewController.Publish)
@@ -38,6 +38,7 @@ func InitRoute(r *gin.Engine) {
 			f.PUT("/edit", ReviewController.Edit)
 			// f.POST("/reply", ReviewController.Reply)
 		}
+
 		// api.POST("login", user.Login)
 
 		// c := api.Group("/contact")

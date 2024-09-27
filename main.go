@@ -21,12 +21,14 @@ var ConfigService service.ConfigService
 var DataBaseService service.DataBaseService
 var UserService service.UserService
 var AuthService service.AuthService
-
+var ExpressionService service.ExpressionService
 var UserDao dao.UserDao
+var ExpressionDao dao.ExpressionDao
 
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
 var ReviewController controller.ReviewController
+var ExpressController controller.ExpressController
 
 func InitComponents() {
 	ConfigService = service.NewConfigService()
@@ -37,10 +39,14 @@ func InitComponents() {
 	DataBaseService.InitializeDataTable()
 
 	UserDao = dao.NewUserDao(DataBaseService.DB)
+	ExpressionDao = dao.NewExpressionDao(DataBaseService.DB)
 
 	UserService = service.NewUserService(UserDao)
 	AuthService = service.NewAuthService(UserDao)
 
+	ExpressionService = service.NewExpressionService(ExpressionDao)
+
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
+	ExpressController = controller.NewExpressController(ExpressionService)
 }
