@@ -6,6 +6,8 @@ import (
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -35,7 +37,7 @@ func (controller AuthController) Authenticate(c *gin.Context) {
 
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		utils.ResponseFailWithoutData(c, "用户名不存在")
-	} else if user.Password != requestBody.Password {
+	} else if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password)) != nil {
 		utils.ResponseFailWithoutData(c, "密码错误")
 	} else {
 		response, error := controller.authService.Authenticate(user.UserId)

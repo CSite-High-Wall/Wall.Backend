@@ -4,6 +4,7 @@ import (
 	"wall-backend/internal/model"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -19,9 +20,13 @@ func NewUserDao(db *gorm.DB) UserDao {
 
 // 创建用户
 func (dao UserDao) CreateUser(userName string, password string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 	result := dao.db.Create(&model.User{
 		UserName: userName,
-		Password: password,
+		Password: string(hash),
 	})
 
 	return result.Error
