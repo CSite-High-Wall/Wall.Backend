@@ -34,5 +34,6 @@ func (service *DataBaseService) Connect() error {
 func (service *DataBaseService) InitializeDataTable() error {
 	return service.DB.AutoMigrate(
 		model.User{},
+		model.Expression{},
 	)
 }
