@@ -66,3 +66,9 @@ func (dao ExpressionDao) FindUserByUserId(ctx context.Context, userid uuid.UUID)
 	result := dao.db.WithContext(ctx).First(&User, userid)
 	return User, result.Error
 }
+
+func (dao ExpressionDao) FindExpressionByExpressionId(ctx context.Context, expressionid uint) (model.Expression, error) {
+	var Expression model.Expression
+	result := dao.db.WithContext(ctx).First(&Expression, expressionid)
+	return Expression, result.Error
+}

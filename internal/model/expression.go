@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-var Anonymity = 1   //匿名
-var noAnonymity = 2 //不匿名
+var NoAnonymity = 1 //不匿名
+var Anonymity = 2   //匿名
 
 type Expression struct {
 	ExpressionID uint           `gorm:"primaryKey" json:"expression_id"`

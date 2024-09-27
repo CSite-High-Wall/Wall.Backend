@@ -41,3 +41,7 @@ func (service ExpressionService) Edit(requestBody model.ExpressionUpdateRequestJ
 func (service ExpressionService) FindUserByUserId(userid uuid.UUID) (model.User, error) {
 	return db.FindUserByUserId(ctx, userid)
 }
+
+func (service ExpressionService) FindExpressionByExpressionId(expressionid uint) (model.Expression, error) {
+	return db.FindExpressionByExpressionId(ctx, expressionid)
+}
