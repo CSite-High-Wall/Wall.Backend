@@ -19,6 +19,7 @@ func NewReviewDao(db *gorm.DB) ReviewDao {
 	}
 }
 
+// 创建评论
 func (dao ReviewDao) CreateReview(ctx context.Context, UserId uuid.UUID, ExpressionId uint, Content string) error {
 	currentTime := time.Now()
 	createTime := currentTime.Format("2006-01-02T15:04:05.999-07:00")
@@ -31,10 +32,13 @@ func (dao ReviewDao) CreateReview(ctx context.Context, UserId uuid.UUID, Express
 	return err
 }
 
+// 删除评论
 func (dao ReviewDao) DeleteReview(ctx context.Context, UserId uuid.UUID, ReviewId uint) error {
 	err := dao.db.WithContext(ctx).Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
 	return err
 }
+
+//更新评论内容
 
 func (dao ReviewDao) UpdateReview(ctx context.Context, UserId uuid.UUID, ReviewId uint, Content string) error {
 	currentTime := time.Now()
@@ -46,6 +50,7 @@ func (dao ReviewDao) UpdateReview(ctx context.Context, UserId uuid.UUID, ReviewI
 	return err
 }
 
+// 根据表白ID查询表白，看表白是否存在
 func (dao ReviewDao) FindPostByPostId(ctx context.Context, ExpressionId uint) (model.Review, error) {
 	var review model.Review
 	result := dao.db.First(&review, "expression_id = ?", ExpressionId)
@@ -53,6 +58,7 @@ func (dao ReviewDao) FindPostByPostId(ctx context.Context, ExpressionId uint) (m
 	return review, result.Error
 }
 
+// 根据评论ID查询评论，看评论是否存在
 func (dao ReviewDao) FindReviewByReviewId(ctx context.Context, ReviewId uint) (model.Review, error) {
 	var review model.Review
 	result := dao.db.First(&review, "review_id = ?", ReviewId)
@@ -60,6 +66,7 @@ func (dao ReviewDao) FindReviewByReviewId(ctx context.Context, ReviewId uint) (m
 	return review, result.Error
 }
 
+// 根据id和评论，看是否是本人操作
 func (dao ReviewDao) FindReviewByUserId(ctx context.Context, UserId uuid.UUID, ReviewId uint) (model.Review, error) {
 	var review model.Review
 	result := dao.db.First(&review, "user_id = ? AND review_id = ?", UserId, ReviewId)

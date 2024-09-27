@@ -19,6 +19,7 @@ func NewReviewController(service service.ReviewService) ReviewController {
 	}
 }
 
+// 发布评论接口
 func (controller ReviewController) Publish(c *gin.Context) {
 	var requestBody model.ReviewCreateRequestJsonObject
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -38,6 +39,7 @@ func (controller ReviewController) Publish(c *gin.Context) {
 	utils.ResponseOkWithoutData(c)
 }
 
+// 删除评论接口
 func (controller ReviewController) Delete(c *gin.Context) {
 	var requestBody model.ReviewDeleteRequestJsonObject
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -58,6 +60,7 @@ func (controller ReviewController) Delete(c *gin.Context) {
 
 }
 
+// 更新评论接口
 func (controller ReviewController) Edit(c *gin.Context) {
 	var requestBody model.ReviewUpdateRequestJsonObject
 	if err := c.BindJSON(&requestBody); err != nil {
