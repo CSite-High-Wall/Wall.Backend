@@ -16,10 +16,10 @@ func NewCommunityDao(db *gorm.DB) CommunityDao {
 }
 
 // 获取所有表白
-func (dao CommunityDao) AllExpression() error {
-	var expression model.Expression
-	result := dao.db.Find(&expression)
-	return result.Error
+func (dao CommunityDao) AllExpression() ([]model.Expression, error) {
+	var expressions []model.Expression
+	result := dao.db.Find(&expressions)
+	return expressions, result.Error
 }
 
 ////获取特定表白

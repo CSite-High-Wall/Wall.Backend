@@ -12,9 +12,9 @@ type CommunityController struct {
 }
 
 func (controller CommunityController) AllExpression(c *gin.Context) {
-	var expressions []*model.Expression
-	result := controller.community.AllExpression()
-	if result.Error != nil {
+	var expressions []model.Expression
+	expressions, err := controller.community.AllExpression()
+	if err != nil {
 		// 如果查询出错，返回内部服务器错误
 		utils.ResponseFail(c, "服务器内部错误，获取表白失败", nil)
 		return
