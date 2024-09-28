@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"net/http"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -91,5 +92,21 @@ func (controller AuthController) Signout(c *gin.Context) {
 		}
 	} else {
 		utils.ResponseFailWithoutData(c, "登录验证失败")
+	}
+}
+
+// 验证令牌接口
+func (controller AuthController) Validate(c *gin.Context) {
+	var requestBody model.AuthTokenRequestJsonObject
+
+	if error := c.BindJSON(&requestBody); error != nil {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	}
+
+	if vaild, _ := controller.authService.VerifyAccessToken(requestBody.AccessToken); vaild {
+		utils.ResponseFrom(c, http.StatusOK, "令牌有效", nil)
+	} else {
+		utils.ResponseFailWithoutData(c, "令牌失效")
 	}
 }

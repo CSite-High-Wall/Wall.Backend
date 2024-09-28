@@ -20,6 +20,7 @@ func InitRoute(r *gin.Engine) {
 		authserver.POST("/authenticate", AuthController.Authenticate)
 		authserver.POST("/refersh", AuthController.Refresh)
 		authserver.POST("/signout", AuthController.Signout)
+		authserver.POST("/validate", AuthController.Validate)
 
 		// b := api.Group("/person")
 		// {
