@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -11,7 +13,7 @@ type Review struct {
 	ExpressionId uint           `json:"expression_id"`
 	Content      string         `json:"content"`
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
-	Time         string         `json:"time"`
+	Time         time.Time      `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"time"`
 }
 
 // func (review *Review) BeforeCreate(tx *gorm.DB) (err error) {

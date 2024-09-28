@@ -20,13 +20,11 @@ func NewReviewDao(db *gorm.DB) ReviewDao {
 
 // 创建评论
 func (dao ReviewDao) CreateReview(UserId uuid.UUID, ExpressionId uint, Content string) error {
-	currentTime := time.Now()
-	createTime := currentTime.Format("2006-01-02T15:04:05.999-07:00")
 	err := dao.db.Create(&model.Review{
 		UserId:       UserId,
 		ExpressionId: ExpressionId,
 		Content:      Content,
-		Time:         createTime,
+		Time:         time.Now(),
 	}).Error
 	return err
 }
@@ -40,11 +38,9 @@ func (dao ReviewDao) DeleteReview(UserId uuid.UUID, ReviewId uint) error {
 //更新评论内容
 
 func (dao ReviewDao) UpdateReview(UserId uuid.UUID, ReviewId uint, Content string) error {
-	currentTime := time.Now()
-	updateTime := currentTime.Format("2006-01-02T15:04:05.999-07:00")
 	err := dao.db.Model(&model.Review{}).Where("user_id=? AND review_id=?", UserId, ReviewId).Updates(map[string]interface{}{
 		"content": Content,
-		"time":    updateTime,
+		"time":    time.Now(),
 	}).Error
 	return err
 }

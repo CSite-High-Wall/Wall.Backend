@@ -36,6 +36,13 @@ func InitRoute(r *gin.Engine) {
 		review.POST("/publish", ReviewController.Publish)
 		review.DELETE("/delete", ReviewController.Delete)
 		review.PUT("/edit", ReviewController.Edit)
+
+		// person:= api.Group("/profile")
+		// blacklist:= person.Group("/blacklist")
+		// blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
+		// blacklist.DELETE("/remove", middleware.AuthToken, BlacklistController.Remove)
+		// blacklist.GET("/get", middleware.AuthToken, BlacklistController.Get)
+
 		// review.POST("/reply", ReviewController.Reply)
 
 		// api.POST("login", user.Login)
