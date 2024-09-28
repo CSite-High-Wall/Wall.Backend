@@ -3,6 +3,9 @@ package utils
 import (
 	"regexp"
 	"wall-backend/internal/model"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func CheckRegisterRequest(requestBody model.RegisterRequestJsonObject) (bool, string) {
@@ -18,4 +21,15 @@ func CheckRegisterRequest(requestBody model.RegisterRequestJsonObject) (bool, st
 	}
 
 	return vaild, message
+}
+
+func ParseUserIdFromRequest(c *gin.Context) uuid.UUID {
+	var userId uuid.UUID = uuid.Nil
+	value, exist := c.Get("user_id")
+
+	if exist {
+		userId = value.(uuid.UUID)
+	}
+
+	return userId
 }

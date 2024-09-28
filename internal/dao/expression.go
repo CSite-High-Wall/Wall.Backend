@@ -3,10 +3,12 @@ package dao
 //和表白的相关数据库操作
 
 import (
+	"time"
+	"wall-backend/internal/model"
+
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"gorm.io/gorm"
-	"wall-backend/internal/model"
 )
 
 type ExpressionDao struct {
@@ -19,59 +21,35 @@ func NewExpressionDao(db *gorm.DB) ExpressionDao {
 	}
 }
 
-//创建非匿名表白
-
-func (dao ExpressionDao) CreateExpression1(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int, UserName string, Title string) error {
-	err := dao.db.WithContext(ctx).Create(&model.Expression{
-		UserID:    UserId,
-		Content:   Content,
-		Anonymity: Anonymity,
-		UserName:  UserName,
-		Title:     Title,
+// 创建表白，anonymity 参数指示是否匿名
+func (dao ExpressionDao) CreateExpression(ctx context.Context, userId uuid.UUID, title string, content string, anonymity bool) error {
+	return dao.db.WithContext(ctx).Create(&model.Expression{
+		UserId:    userId,
+		Title:     title,
+		Content:   content,
+		Anonymity: anonymity,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}).Error
-	return err
 }
 
-//创建匿名表白
-
-func (dao ExpressionDao) CreateExpression2(ctx context.Context, UserId uuid.UUID, Content string, Anonymity int, Title string) error {
-	err := dao.db.WithContext(ctx).Create(&model.Expression{
-		UserID:    UserId,
-		Content:   Content,
-		UserName:  "匿名",
-		Anonymity: Anonymity,
-		Title:     Title,
+// 更新表白内容
+func (dao ExpressionDao) UpdateExpression(ctx context.Context, userId uuid.UUID, expressionId uint, title string, content string) error {
+	return dao.db.WithContext(ctx).Model(&model.Expression{}).Where("user_id=? AND expression_id=?", userId, expressionId).Updates(map[string]interface{}{
+		"title":      title,
+		"content":    content,
+		"updated_at": time.Now(),
 	}).Error
-	return err
 }
 
-//更新表白内容
-
-func (dao ExpressionDao) UpdateExpression(ctx context.Context, UserId uuid.UUID, ExpressionId uint, Content string,Title string) error {
-	err := dao.db.WithContext(ctx).Model(&model.Expression{}).Where("user_id=? AND expression_id=?", UserId, ExpressionId).Updates(map[string]interface{}{
-		"content": Content,
-		"title":Title,
-	}).Error
-	return err
+// 删除表白
+func (dao ExpressionDao) DeleteExpression(ctx context.Context, userId uuid.UUID, expressionId uint) error {
+	return dao.db.WithContext(ctx).Where("user_id=? AND expression_id=?", userId, expressionId).Delete(&model.Expression{}).Error
 }
 
-//删除表白
-
-func (dao ExpressionDao) DeleteExpression(ctx context.Context, UserId uuid.UUID, ExpressionId uint) error {
-	err := dao.db.WithContext(ctx).Where("user_id=? AND expression_id=?", UserId, ExpressionId).Delete(&model.Expression{}).Error
-	return err
-}
-
-//查找用户是否存在
-
-func (dao ExpressionDao) FindUserByUserId(ctx context.Context, userid uuid.UUID) (model.User, error) {
-	var User model.User
-	result := dao.db.WithContext(ctx).First(&User, userid)
-	return User, result.Error
-}
-
-func (dao ExpressionDao) FindExpressionByExpressionId(ctx context.Context, expressionid uint) (model.Expression, error) {
-	var Expression model.Expression
-	result := dao.db.WithContext(ctx).First(&Expression, expressionid)
-	return Expression, result.Error
+// 根据 ExpressionId 查找表白
+func (dao ExpressionDao) FindExpressionByExpressionId(ctx context.Context, expressionId uint) (model.Expression, error) {
+	var expression model.Expression
+	result := dao.db.WithContext(ctx).First(&expression, expressionId)
+	return expression, result.Error
 }

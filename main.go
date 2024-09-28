@@ -3,6 +3,7 @@ package main
 import (
 	"wall-backend/internal/controller"
 	"wall-backend/internal/dao"
+	"wall-backend/internal/middleware"
 	"wall-backend/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -22,13 +23,14 @@ var DataBaseService service.DataBaseService
 var UserService service.UserService
 var AuthService service.AuthService
 var ExpressionService service.ExpressionService
+
 var UserDao dao.UserDao
 var ExpressionDao dao.ExpressionDao
 
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
-var ReviewController controller.ReviewController
 var ExpressController controller.ExpressController
+var ReviewController controller.ReviewController
 
 func InitComponents() {
 	ConfigService = service.NewConfigService()
@@ -48,5 +50,7 @@ func InitComponents() {
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
-	ExpressController = controller.NewExpressController(ExpressionService)
+	ExpressController = controller.NewExpressController(UserService, ExpressionService)
+
+	middleware.AuthService = AuthService
 }

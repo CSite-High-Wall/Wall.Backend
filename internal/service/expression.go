@@ -1,9 +1,10 @@
 package service
 
 import (
-	"github.com/google/uuid"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
+
+	"github.com/google/uuid"
 )
 
 type ExpressionService struct {
@@ -18,28 +19,17 @@ func NewExpressionService(expressionDao dao.ExpressionDao) ExpressionService {
 
 var db dao.ExpressionDao
 
-//非匿名
-
-func (service ExpressionService) Publish1(requestBody model.ExpressionCreateRequestJsonObject) error {
-	return db.CreateExpression1(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity, requestBody.UserName,requestBody.Title)
+// anonymity 参数指示是否匿名
+func (service ExpressionService) Publish(userId uuid.UUID, requestBody model.ExpressionCreateRequestJsonObject) error {
+	return db.CreateExpression(ctx, userId, requestBody.Title, requestBody.Content, requestBody.Anonymity)
 }
 
-//匿名
-
-func (service ExpressionService) Publish2(requestBody model.ExpressionCreateRequestJsonObject) error {
-	return db.CreateExpression2(ctx, requestBody.UserId, requestBody.Content, requestBody.Anonymity, requestBody.Title)
+func (service ExpressionService) Edit(userId uuid.UUID, requestBody model.ExpressionUpdateRequestJsonObject) error {
+	return db.UpdateExpression(ctx, userId, requestBody.ExpressionId, requestBody.Content, requestBody.Title)
 }
 
-func (service ExpressionService) Delete(requestBody model.ExpressionDeleteRequestJsonObject) error {
-	return db.DeleteExpression(ctx, requestBody.UserId, requestBody.ExpressionID)
-}
-
-func (service ExpressionService) Edit(requestBody model.ExpressionUpdateRequestJsonObject) error {
-	return db.UpdateExpression(ctx, requestBody.UserId, requestBody.ExpressionID, requestBody.Content,requestBody.Title)
-}
-
-func (service ExpressionService) FindUserByUserId(userid uuid.UUID) (model.User, error) {
-	return db.FindUserByUserId(ctx, userid)
+func (service ExpressionService) Delete(userId uuid.UUID, requestBody model.ExpressionDeleteRequestJsonObject) error {
+	return db.DeleteExpression(ctx, userId, requestBody.ExpressionId)
 }
 
 func (service ExpressionService) FindExpressionByExpressionId(expressionid uint) (model.Expression, error) {

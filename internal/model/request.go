@@ -35,21 +35,17 @@ type ReviewUpdateRequestJsonObject struct {
 }
 
 type ExpressionCreateRequestJsonObject struct {
-	UserId    uuid.UUID `json:"user_id" `
-	Content   string    `json:"content"`
-	Anonymity int       `json:"anonymity"`
-	UserName  string    `json:"user_name"`
-	Title     string    `json:"title"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Anonymity bool   `json:"anonymity"`
 }
 
 type ExpressionUpdateRequestJsonObject struct {
-	UserId       uuid.UUID `json:"user_id" `
-	Content      string    `json:"content"`
-	ExpressionID uint      `json:"expression_id"`
-	Title        string    `json:"title"`
+	ExpressionId uint   `json:"expression_id"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
 }
 
 type ExpressionDeleteRequestJsonObject struct {
-	UserId       uuid.UUID `json:"user_id" `
-	ExpressionID uint      `json:"expression_id"`
+	ExpressionId uint `json:"expression_id"`
 }
