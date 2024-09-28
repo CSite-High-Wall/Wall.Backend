@@ -52,3 +52,7 @@ type ExpressionAllGetRequestJsonObject struct {
 	Title        string `json:"title"`
 	Content      string `json:"content"`
 }
+
+type GetExpressionById struct {
+	ExpressionId uint `json:"expression_id"`
+}
