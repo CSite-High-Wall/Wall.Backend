@@ -45,6 +45,9 @@ func InitRoute(r *gin.Engine) {
 		// 	c.PUT("", contact.UpdateContact)
 		// 	c.DELETE("", contact.DeleteContact)
 		// 	c.GET("", contact.GetContact)
-		// }
+
+		//community := api.Group("/community")
+		//community.GET("/expression",CommunityController.AllExpression)
+		//// }
 	}
 }

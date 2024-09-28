@@ -46,3 +46,9 @@ type ReviewUpdateRequestJsonObject struct {
 	ID      uint   `json:"review_id"`
 	Content string `json:"content"`
 }
+
+type ExpressionAllGetRequestJsonObject struct {
+	ExpressionId uint   `json:"expression_id"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+}
