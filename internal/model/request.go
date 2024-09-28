@@ -17,6 +17,22 @@ type AuthTokenRequestJsonObject struct {
 	AccessToken string    `json:"access_token"`
 }
 
+type ExpressionCreateRequestJsonObject struct {
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Anonymity bool   `json:"anonymity"`
+}
+
+type ExpressionUpdateRequestJsonObject struct {
+	ExpressionId uint   `json:"expression_id"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+}
+
+type ExpressionDeleteRequestJsonObject struct {
+	ExpressionId uint `json:"expression_id"`
+}
+
 type ReviewCreateRequestJsonObject struct {
 	UserId       uuid.UUID `json:"user_id" `
 	ExpressionId uint      `json:"expression_id"`
@@ -32,20 +48,4 @@ type ReviewUpdateRequestJsonObject struct {
 	UserId  uuid.UUID `json:"user_id" `
 	ID      uint      `json:"review_id"`
 	Content string    `json:"content"`
-}
-
-type ExpressionCreateRequestJsonObject struct {
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Anonymity bool   `json:"anonymity"`
-}
-
-type ExpressionUpdateRequestJsonObject struct {
-	ExpressionId uint   `json:"expression_id"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-}
-
-type ExpressionDeleteRequestJsonObject struct {
-	ExpressionId uint `json:"expression_id"`
 }

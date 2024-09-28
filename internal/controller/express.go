@@ -68,7 +68,7 @@ func (controller ExpressController) Edit(c *gin.Context) {
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取表白信息失败")
 		} else if expression.UserId != userId {
-			utils.ResponseFailWithoutData(c, "您只能修改自己的帖子") //判断创建表白的用户和请求者是否为同一人
+			utils.ResponseFailWithoutData(c, "您只能修改自己的帖子") // 判断创建表白的用户和请求者是否为同一人
 		} else if error := controller.expressionService.Edit(userId, requestBody); error != nil {
 			utils.ResponseFailWithoutData(c, "修改表白失败")
 		} else {
@@ -77,8 +77,7 @@ func (controller ExpressController) Edit(c *gin.Context) {
 	}
 }
 
-//删除表白
-
+// 删除表白
 func (controller ExpressController) Delete(c *gin.Context) {
 	var requestBody model.ExpressionDeleteRequestJsonObject
 	var userId = utils.ParseUserIdFromRequest(c)

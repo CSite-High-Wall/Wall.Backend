@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -11,7 +12,16 @@ import (
 var AuthService service.AuthService
 
 func AuthToken(c *gin.Context) {
-	accessToken := c.Request.Header.Get("Authorization")
+	authorization := c.Request.Header.Get("Authorization")
+
+	parts := strings.SplitN(authorization, " ", 2)
+	accessToken := parts[1]
+
+	if !(len(parts) == 2 && parts[0] == "Bearer") {
+		utils.ResponseFrom(c, http.StatusBadRequest, "请求头中的 Authorization 格式错误", nil)
+		return
+	}
+
 	vaild, uuid := AuthService.VerifyAccessToken(accessToken)
 
 	if !vaild {

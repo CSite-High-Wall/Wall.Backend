@@ -17,21 +17,19 @@ func NewExpressionService(expressionDao dao.ExpressionDao) ExpressionService {
 	}
 }
 
-var db dao.ExpressionDao
-
 // anonymity 参数指示是否匿名
 func (service ExpressionService) Publish(userId uuid.UUID, requestBody model.ExpressionCreateRequestJsonObject) error {
-	return db.CreateExpression(ctx, userId, requestBody.Title, requestBody.Content, requestBody.Anonymity)
+	return service.expressionDao.CreateExpression(userId, requestBody.Title, requestBody.Content, requestBody.Anonymity)
 }
 
 func (service ExpressionService) Edit(userId uuid.UUID, requestBody model.ExpressionUpdateRequestJsonObject) error {
-	return db.UpdateExpression(ctx, userId, requestBody.ExpressionId, requestBody.Content, requestBody.Title)
+	return service.expressionDao.UpdateExpression(userId, requestBody.ExpressionId, requestBody.Content, requestBody.Title)
 }
 
 func (service ExpressionService) Delete(userId uuid.UUID, requestBody model.ExpressionDeleteRequestJsonObject) error {
-	return db.DeleteExpression(ctx, userId, requestBody.ExpressionId)
+	return service.expressionDao.DeleteExpression(userId, requestBody.ExpressionId)
 }
 
 func (service ExpressionService) FindExpressionByExpressionId(expressionid uint) (model.Expression, error) {
-	return db.FindExpressionByExpressionId(ctx, expressionid)
+	return service.expressionDao.FindExpressionByExpressionId(expressionid)
 }

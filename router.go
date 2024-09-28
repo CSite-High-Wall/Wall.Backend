@@ -26,7 +26,7 @@ func InitRoute(r *gin.Engine) {
 		// 	b.POST("/nickname/edit", UserController.Nickname)
 		// }
 
-		expression := api.Group("/expression")
+		expression := api.Group("/express")
 		expression.PUT("/edit", middleware.AuthToken, ExpressController.Edit)
 		expression.DELETE("/delete", middleware.AuthToken, ExpressController.Delete)
 		expression.POST("/publish", middleware.AuthToken, ExpressController.Publish)
