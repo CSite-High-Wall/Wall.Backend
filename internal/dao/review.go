@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"context"
 	"time"
 	"wall-backend/internal/model"
 
@@ -20,10 +19,10 @@ func NewReviewDao(db *gorm.DB) ReviewDao {
 }
 
 // 创建评论
-func (dao ReviewDao) CreateReview(ctx context.Context, UserId uuid.UUID, ExpressionId uint, Content string) error {
+func (dao ReviewDao) CreateReview(UserId uuid.UUID, ExpressionId uint, Content string) error {
 	currentTime := time.Now()
 	createTime := currentTime.Format("2006-01-02T15:04:05.999-07:00")
-	err := dao.db.WithContext(ctx).Create(&model.Review{
+	err := dao.db.Create(&model.Review{
 		UserId:       UserId,
 		ExpressionId: ExpressionId,
 		Content:      Content,
@@ -33,17 +32,17 @@ func (dao ReviewDao) CreateReview(ctx context.Context, UserId uuid.UUID, Express
 }
 
 // 删除评论
-func (dao ReviewDao) DeleteReview(ctx context.Context, UserId uuid.UUID, ReviewId uint) error {
-	err := dao.db.WithContext(ctx).Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
+func (dao ReviewDao) DeleteReview(UserId uuid.UUID, ReviewId uint) error {
+	err := dao.db.Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
 	return err
 }
 
 //更新评论内容
 
-func (dao ReviewDao) UpdateReview(ctx context.Context, UserId uuid.UUID, ReviewId uint, Content string) error {
+func (dao ReviewDao) UpdateReview(UserId uuid.UUID, ReviewId uint, Content string) error {
 	currentTime := time.Now()
 	updateTime := currentTime.Format("2006-01-02T15:04:05.999-07:00")
-	err := dao.db.WithContext(ctx).Model(&model.Review{}).Where("user_id=? AND review_id=?", UserId, ReviewId).Updates(map[string]interface{}{
+	err := dao.db.Model(&model.Review{}).Where("user_id=? AND review_id=?", UserId, ReviewId).Updates(map[string]interface{}{
 		"content": Content,
 		"time":    updateTime,
 	}).Error
@@ -51,7 +50,7 @@ func (dao ReviewDao) UpdateReview(ctx context.Context, UserId uuid.UUID, ReviewI
 }
 
 // 根据表白ID查询表白，看表白是否存在
-func (dao ReviewDao) FindPostByPostId(ctx context.Context, ExpressionId uint) (model.Review, error) {
+func (dao ReviewDao) FindPostByPostId(ExpressionId uint) (model.Review, error) {
 	var review model.Review
 	result := dao.db.First(&review, "expression_id = ?", ExpressionId)
 
@@ -59,20 +58,20 @@ func (dao ReviewDao) FindPostByPostId(ctx context.Context, ExpressionId uint) (m
 }
 
 // 根据评论ID查询评论，看评论是否存在
-func (dao ReviewDao) FindReviewByReviewId(ctx context.Context, ReviewId uint) (model.Review, error) {
+func (dao ReviewDao) FindReviewByReviewId(ReviewId uint) (model.Review, error) {
 	var review model.Review
 	result := dao.db.First(&review, "review_id = ?", ReviewId)
 
 	return review, result.Error
 }
 
-// 根据id和评论，看是否是本人操作
-func (dao ReviewDao) FindReviewByUserId(ctx context.Context, UserId uuid.UUID, ReviewId uint) (model.Review, error) {
-	var review model.Review
-	result := dao.db.First(&review, "user_id = ? AND review_id = ?", UserId, ReviewId)
+// // 根据id和评论，看是否是本人操作
+// func (dao ReviewDao) FindReviewByUserId(ctx context.Context,ReviewId uint) (model.Review, error) {
+// 	var review model.Review
+// 	result := dao.db.First(&review, "user_id = ? AND review_id = ?", UserId, ReviewId)
 
-	return review, result.Error
-}
+// 	return review, result.Error
+// }
 
 // // SoftDeleteReport 软删除一个帖子
 // func SoftDeleteReport(user_id uint, post_id uint) (*models.Post, error) {

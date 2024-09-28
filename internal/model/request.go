@@ -34,18 +34,15 @@ type ExpressionDeleteRequestJsonObject struct {
 }
 
 type ReviewCreateRequestJsonObject struct {
-	UserId       uuid.UUID `json:"user_id" `
-	ExpressionId uint      `json:"expression_id"`
-	Content      string    `json:"content"`
+	ExpressionId uint   `json:"expression_id"`
+	Content      string `json:"content"`
 }
 
 type ReviewDeleteRequestJsonObject struct {
-	UserId uuid.UUID `json:"user_id" `
-	ID     uint      `json:"review_id"`
+	ID uint `json:"review_id"`
 }
 
 type ReviewUpdateRequestJsonObject struct {
-	UserId  uuid.UUID `json:"user_id" `
-	ID      uint      `json:"review_id"`
-	Content string    `json:"content"`
+	ID      uint   `json:"review_id"`
+	Content string `json:"content"`
 }
