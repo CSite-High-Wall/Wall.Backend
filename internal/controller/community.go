@@ -1,12 +1,9 @@
 package controller
 
 import (
-	"errors"
 	"strconv"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
-
-	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -100,40 +97,6 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 				"title":         expression.Title,
 				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
 			})
-		}
-	}
-}
-
-// 获取自己的所有表白
-func (controller CommunityController) FetchUserExpression(c *gin.Context) {
-	var userId = utils.ParseUserIdFromRequest(c) //获取请求体地UserId
-	user, error := controller.userService.FindUserByUserId(userId)
-
-	if errors.Is(error, gorm.ErrRecordNotFound) {
-		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
-	} else if error != nil {
-		utils.ResponseFailWithoutData(c, "获取用户信息失败")
-	} else {
-		expressions, err := controller.expressionService.FetchUserExpression(userId)
-
-		if err != nil {
-			utils.ResponseFailWithoutData(c, "获取个人表白列表失败") // 如果查询出错，返回内部服务器错误
-		} else {
-			var expressionList []gin.H
-			for _, expression := range expressions { // 遍历表白，将特定表白的信息添加到expressionList中
-				expressionList = append(expressionList, gin.H{
-					"expression_id": expression.ExpressionId,
-					"user_id":       expression.UserId,
-					"user_name":     user.UserName,
-					"content":       expression.Content,
-					"title":         expression.Title,
-					"time":          expression.CreatedAt,
-				})
-			}
-
-			utils.ResponseOk(c, gin.H{
-				"expression_list": expressionList,
-			}) // 返回成功响应
 		}
 	}
 }

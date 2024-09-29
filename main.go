@@ -51,7 +51,7 @@ func InitComponents() {
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
-	ProfileController = controller.NewProfileController(UserService)
+	ProfileController = controller.NewProfileController(UserService, ExpressionService)
 	ExpressController = controller.NewExpressController(UserService, ExpressionService)
 	CommunityController = controller.NewCommunityController(UserService, ExpressionService)
 

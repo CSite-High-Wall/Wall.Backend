@@ -24,6 +24,7 @@ func InitRoute(r *gin.Engine) {
 
 		profile := api.Group("/profile")
 		profile.GET("/user-info", middleware.AuthToken, ProfileController.GetUserInfo)
+		profile.GET("/expressions", middleware.AuthToken, ProfileController.FetchUserExpressions)
 		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
 		// profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadAvatar)
 
