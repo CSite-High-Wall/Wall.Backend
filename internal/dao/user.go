@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"time"
 	"wall-backend/internal/model"
 
 	"github.com/google/uuid"
@@ -51,5 +52,11 @@ func (dao UserDao) FindUserByUserId(userId uuid.UUID) (model.User, error) {
 // 更新数据库中指定用户的令牌标识符
 func (dao UserDao) UpdateTokenOfUser(userID uuid.UUID, token_identifier uuid.UUID) error {
 	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("TokenIdentifier", token_identifier)
+	return result.Error
+}
+
+// 更新数据库中指定用户的最后一次登录时间
+func (dao UserDao) UpdateLastLoginTimeOfUser(userID uuid.UUID) error {
+	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("LastLoginTime", time.Now())
 	return result.Error
 }

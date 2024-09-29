@@ -39,3 +39,19 @@ func (service UserService) ContainsUserName(userName string) (bool, error) {
 
 	return user.UserName == userName, error
 }
+
+func (service UserService) GetUserInfoByUserId(userId uuid.UUID) (interface{}, error) {
+	user, error := service.userDao.FindUserByUserId(userId)
+
+	if error != nil {
+		return nil, error
+	} else {
+		return model.UserInfoResponseJsonObject{
+			UserId:        userId,
+			UserName:      user.UserName,
+			AvatarUrl:     user.AvatarUrl,
+			CreatedAt:     user.CreatedAt,
+			LastLoginTime: user.LastLoginTime,
+		}, nil
+	}
+}

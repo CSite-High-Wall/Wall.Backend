@@ -37,6 +37,8 @@ func (service AuthService) Authenticate(userId uuid.UUID) (interface{}, error) {
 
 	if error := service.userDao.UpdateTokenOfUser(user.UserId, uuid); error != nil {
 		return nil, error
+	} else if error := service.userDao.UpdateLastLoginTimeOfUser(user.UserId); error != nil {
+		return nil, error
 	}
 
 	return model.AuthTokenResponseJsonObject{

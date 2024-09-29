@@ -29,6 +29,7 @@ var ExpressionDao dao.ExpressionDao
 
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
+var ProfileController controller.ProfileController
 var ExpressController controller.ExpressController
 var CommunityController controller.CommunityController
 var ReviewController controller.ReviewController
@@ -50,6 +51,7 @@ func InitComponents() {
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
+	ProfileController = controller.NewProfileController(UserService)
 	ExpressController = controller.NewExpressController(UserService, ExpressionService)
 	CommunityController = controller.NewCommunityController(UserService, ExpressionService)
 

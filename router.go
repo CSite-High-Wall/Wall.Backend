@@ -22,41 +22,29 @@ func InitRoute(r *gin.Engine) {
 		authserver.POST("/signout", AuthController.Signout)
 		authserver.POST("/validate", AuthController.Validate)
 
-		// b := api.Group("/person")
-		// {
-		// 	b.POST("/nickname/edit", UserController.Nickname)
-		// }
+		profile := api.Group("/profile")
+		profile.GET("/user-info", middleware.AuthToken, ProfileController.GetUserInfo)
+		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
+		// profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadAvatar)
 
-		expression := api.Group("/express")
-		expression.PUT("/edit", middleware.AuthToken, ExpressController.Edit)
-		expression.DELETE("/delete", middleware.AuthToken, ExpressController.Delete)
-		expression.POST("/publish", middleware.AuthToken, ExpressController.Publish)
+		// blacklist:= profile.Group("/blacklist")
+		// blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
+		// blacklist.DELETE("/remove", middleware.AuthToken, BlacklistController.Remove)
+		// blacklist.GET("/get", middleware.AuthToken, BlacklistController.Get)
 
 		community := api.Group("/community")
 		community.GET("/expressions", CommunityController.FetchAllExpression)
 		community.GET("/expression", CommunityController.FetchTargetedExpression)
 
+		expression := api.Group("/express")
+		expression.POST("/publish", middleware.AuthToken, ExpressController.Publish)
+		expression.PUT("/edit", middleware.AuthToken, ExpressController.Edit)
+		expression.DELETE("/delete", middleware.AuthToken, ExpressController.Delete)
+
 		review := api.Group("/review")
-		review.POST("/publish", ReviewController.Publish)
-		review.DELETE("/delete", ReviewController.Delete)
-		review.PUT("/edit", ReviewController.Edit)
-
-		// person:= api.Group("/profile")
-		// blacklist:= person.Group("/blacklist")
-		// blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
-		// blacklist.DELETE("/remove", middleware.AuthToken, BlacklistController.Remove)
-		// blacklist.GET("/get", middleware.AuthToken, BlacklistController.Get)
-
-		// review.POST("/reply", ReviewController.Reply)
-
-		// api.POST("login", user.Login)
-
-		// c := api.Group("/contact")
-		// {
-		// 	c.POST("", contact.CreateContact)
-		// 	c.PUT("", contact.UpdateContact)
-		// 	c.DELETE("", contact.DeleteContact)
-		// 	c.GET("", contact.GetContact)
-		// }
+		review.POST("/publish", middleware.AuthToken, ReviewController.Publish)
+		review.DELETE("/delete", middleware.AuthToken, ReviewController.Delete)
+		review.PUT("/edit", middleware.AuthToken, ReviewController.Edit)
+		// review.POST("/reply", middleware.AuthToken, ReviewController.Reply)
 	}
 }

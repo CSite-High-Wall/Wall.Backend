@@ -40,14 +40,18 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 			}
 
 			var displayUserName string = "匿名用户"
+			var displayAvatar string = ""
+
 			if !expression.Anonymity {
 				displayUserName = user.UserName
+				displayAvatar = user.AvatarUrl
 			}
 
 			expressionList = append(expressionList, gin.H{
 				"expression_id": expression.ExpressionId,
 				"user_id":       expression.UserId,
 				"user_name":     displayUserName,
+				"avatar_url":    displayAvatar,
 				"title":         expression.Title,
 				"content":       expression.Content,
 				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
@@ -80,14 +84,18 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 			utils.ResponseFailWithoutData(c, "获取指定表白失败")
 		} else {
 			var displayUserName string = "匿名用户"
+			var displayAvatar string = ""
+
 			if !expression.Anonymity {
 				displayUserName = user.UserName
+				displayAvatar = user.AvatarUrl
 			}
 
 			utils.ResponseOk(c, gin.H{
 				"expression_id": expression.ExpressionId,
-				"user_name":     displayUserName,
 				"user_id":       expression.UserId,
+				"user_name":     displayUserName,
+				"avatar_url":    displayAvatar,
 				"content":       expression.Content,
 				"title":         expression.Title,
 				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
