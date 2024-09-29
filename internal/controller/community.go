@@ -69,7 +69,19 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 	if err != nil {
 		utils.ResponseFailWithoutData(c, "获取指定表白失败") // 如果查询出错，返回内部服务器错误
 	} else {
-		utils.ResponseOk(c, expression)
+		user, error := controller.userService.FindUserByUserId(expression.UserId)
+		if error != nil {
+			utils.ResponseFailWithoutData(c, "获取指定表白失败")
+		} else {
+			utils.ResponseOk(c, gin.H{
+				"expression_id": expression.ExpressionId,
+				"user_name":     user.UserName,
+				"user_id":       expression.UserId,
+				"content":       expression.Content,
+				"title":         expression.Title,
+				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
+			})
+		}
 	}
 }
 
