@@ -55,7 +55,11 @@ func InitRoute(r *gin.Engine) {
 		// 	c.GET("", contact.GetContact)
 
 		//community := api.Group("/community")
-		//community.GET("/expression",CommunityController.AllExpression)
-		//// }
+		//community.GET("/expressions",CommunityController.AllExpression)
+		//community.GET("/expression",CommunityController.GetExpressionById)
+		//
+		//profile := api.Group("/profile")
+		//profile.GET("/expressions",CommunityController.GetMyExpressionById)
+		//}
 	}
 }

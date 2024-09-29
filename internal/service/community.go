@@ -22,3 +22,11 @@ func (service CommunityService) AllExpression() ([]model.Expression, error) {
 	}
 	return expressions, nil
 }
+
+func (service CommunityService) GetExpressionById(expressionId uint) (model.Expression, error) {
+	expression, err := service.communityDao.GetExpressionById(expressionId)
+	if err != nil {
+		return model.Expression{}, err
+	}
+	return expression, nil
+}

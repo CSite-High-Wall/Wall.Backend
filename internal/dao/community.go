@@ -22,8 +22,9 @@ func (dao CommunityDao) AllExpression() ([]model.Expression, error) {
 	return expressions, result.Error
 }
 
-////获取特定表白
-//func (dao CommunityDao) PartExpression() (error) {
-//	var expression model.Expression
-//	result := dao.db.Find(&expression)
-//	return  result.Error
+// 获取特定表白
+func (dao CommunityDao) GetExpressionById(expressionId uint) (model.Expression, error) {
+	var expression model.Expression
+	result := dao.db.First(&expression, expressionId)
+	return expression, result.Error
+}
