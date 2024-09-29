@@ -34,16 +34,22 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 		for _, expression := range expressions { // 遍历所有表白，将每个表白的信息添加到expressionList中
 
 			user, error := controller.userService.FindUserByUserId(expression.UserId)
+
 			if error != nil {
 				continue
 			}
 
+			var displayUserName string = "匿名用户"
+			if !expression.Anonymity {
+				displayUserName = user.UserName
+			}
+
 			expressionList = append(expressionList, gin.H{
 				"expression_id": expression.ExpressionId,
-				"user_name":     user.UserName,
 				"user_id":       expression.UserId,
-				"content":       expression.Content,
+				"user_name":     displayUserName,
 				"title":         expression.Title,
+				"content":       expression.Content,
 				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
 			})
 		}
@@ -73,9 +79,14 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取指定表白失败")
 		} else {
+			var displayUserName string = "匿名用户"
+			if !expression.Anonymity {
+				displayUserName = user.UserName
+			}
+
 			utils.ResponseOk(c, gin.H{
 				"expression_id": expression.ExpressionId,
-				"user_name":     user.UserName,
+				"user_name":     displayUserName,
 				"user_id":       expression.UserId,
 				"content":       expression.Content,
 				"title":         expression.Title,
