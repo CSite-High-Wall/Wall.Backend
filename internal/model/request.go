@@ -24,17 +24,27 @@ type ExpressionCreateRequestJsonObject struct {
 }
 
 type ExpressionUpdateRequestJsonObject struct {
-	ExpressionId uint   `json:"expression_id"`
+	ExpressionId uint64 `json:"expression_id"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
 }
 
 type ExpressionDeleteRequestJsonObject struct {
-	ExpressionId uint `json:"expression_id"`
+	ExpressionId uint64 `json:"expression_id"`
+}
+
+type ExpressionAllGetRequestJsonObject struct {
+	ExpressionId uint64 `json:"expression_id"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+}
+
+type ExpressionTargetedRequestJsonObject struct {
+	ExpressionId uint64 `json:"expression_id"`
 }
 
 type ReviewCreateRequestJsonObject struct {
-	ExpressionId uint   `json:"expression_id"`
+	ExpressionId uint64 `json:"expression_id"`
 	Content      string `json:"content"`
 }
 
@@ -45,16 +55,6 @@ type ReviewDeleteRequestJsonObject struct {
 type ReviewUpdateRequestJsonObject struct {
 	ID      uint   `json:"review_id"`
 	Content string `json:"content"`
-}
-
-type ExpressionAllGetRequestJsonObject struct {
-	ExpressionId uint   `json:"expression_id"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-}
-
-type GetExpressionById struct {
-	ExpressionId uint `json:"expression_id"`
 }
 
 type BlacklistCreateRequestJsonObject struct {

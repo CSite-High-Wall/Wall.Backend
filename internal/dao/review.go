@@ -19,7 +19,7 @@ func NewReviewDao(db *gorm.DB) ReviewDao {
 }
 
 // 创建评论
-func (dao ReviewDao) CreateReview(UserId uuid.UUID, ExpressionId uint, Content string) error {
+func (dao ReviewDao) CreateReview(UserId uuid.UUID, ExpressionId uint64, Content string) error {
 	err := dao.db.Create(&model.Review{
 		UserId:       UserId,
 		ExpressionId: ExpressionId,

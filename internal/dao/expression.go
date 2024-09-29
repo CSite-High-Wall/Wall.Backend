@@ -33,7 +33,7 @@ func (dao ExpressionDao) CreateExpression(userId uuid.UUID, title string, conten
 }
 
 // 更新表白内容
-func (dao ExpressionDao) UpdateExpression(userId uuid.UUID, expressionId uint, title string, content string) error {
+func (dao ExpressionDao) UpdateExpression(userId uuid.UUID, expressionId uint64, title string, content string) error {
 	return dao.db.Model(&model.Expression{}).Where("user_id=? AND expression_id=?", userId, expressionId).Updates(map[string]interface{}{
 		"title":      title,
 		"content":    content,
@@ -42,13 +42,27 @@ func (dao ExpressionDao) UpdateExpression(userId uuid.UUID, expressionId uint, t
 }
 
 // 删除表白
-func (dao ExpressionDao) DeleteExpression(userId uuid.UUID, expressionId uint) error {
+func (dao ExpressionDao) DeleteExpression(userId uuid.UUID, expressionId uint64) error {
 	return dao.db.Where("user_id=? AND expression_id=?", userId, expressionId).Delete(&model.Expression{}).Error
 }
 
 // 根据 ExpressionId 查找表白
-func (dao ExpressionDao) FindExpressionByExpressionId(expressionId uint) (model.Expression, error) {
+func (dao ExpressionDao) FindExpressionByExpressionId(expressionId uint64) (model.Expression, error) {
 	var expression model.Expression
 	result := dao.db.First(&expression, expressionId)
 	return expression, result.Error
+}
+
+// 根据 UserId 查找表白
+func (dao ExpressionDao) FindExpressionByUserId(userId uuid.UUID) ([]model.Expression, error) {
+	var expressions []model.Expression
+	result := dao.db.Find(&expressions, "user_id = ?", userId)
+	return expressions, result.Error
+}
+
+// 获取所有已发布的表白
+func (dao ExpressionDao) FetchAllExpression() ([]model.Expression, error) {
+	var expressions []model.Expression
+	result := dao.db.Find(&expressions)
+	return expressions, result.Error
 }

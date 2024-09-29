@@ -32,6 +32,10 @@ func InitRoute(r *gin.Engine) {
 		expression.DELETE("/delete", middleware.AuthToken, ExpressController.Delete)
 		expression.POST("/publish", middleware.AuthToken, ExpressController.Publish)
 
+		community := api.Group("/community")
+		community.GET("/expressions", CommunityController.FetchAllExpression)
+		community.GET("/expression", CommunityController.FetchTargetedExpression)
+
 		review := api.Group("/review")
 		review.POST("/publish", ReviewController.Publish)
 		review.DELETE("/delete", ReviewController.Delete)
@@ -53,13 +57,6 @@ func InitRoute(r *gin.Engine) {
 		// 	c.PUT("", contact.UpdateContact)
 		// 	c.DELETE("", contact.DeleteContact)
 		// 	c.GET("", contact.GetContact)
-
-		//community := api.Group("/community")
-		//community.GET("/expressions",CommunityController.AllExpression)
-		//community.GET("/expression",CommunityController.GetExpressionById)
-		//
-		//profile := api.Group("/profile")
-		//profile.GET("/expressions",CommunityController.GetMyExpressionById)
-		//}
+		// }
 	}
 }

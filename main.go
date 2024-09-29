@@ -15,7 +15,7 @@ func main() {
 	InitComponents()
 	InitRoute(r)
 
-	r.Run()
+	r.Run(":8000")
 }
 
 var ConfigService service.ConfigService
@@ -30,6 +30,7 @@ var ExpressionDao dao.ExpressionDao
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
 var ExpressController controller.ExpressController
+var CommunityController controller.CommunityController
 var ReviewController controller.ReviewController
 
 func InitComponents() {
@@ -45,12 +46,12 @@ func InitComponents() {
 
 	UserService = service.NewUserService(UserDao)
 	AuthService = service.NewAuthService(UserDao)
-
 	ExpressionService = service.NewExpressionService(ExpressionDao)
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
 	ExpressController = controller.NewExpressController(UserService, ExpressionService)
+	CommunityController = controller.NewCommunityController(UserService, ExpressionService)
 
 	middleware.AuthService = AuthService
 }

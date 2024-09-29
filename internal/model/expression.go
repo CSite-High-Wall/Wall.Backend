@@ -10,7 +10,7 @@ import (
 
 type Expression struct {
 	UserId       uuid.UUID      `gorm:"type:char(36);not null" json:"user_id"`
-	ExpressionId uint           `gorm:"primaryKey;uniqueIndex;autoIncrement" json:"expression_id"`
+	ExpressionId uint64         `gorm:"primaryKey;uniqueIndex;autoIncrement" json:"expression_id"`
 	Title        string         `gorm:"default:无标题" json:"title"`
 	Content      string         `gorm:"not null" json:"content"`
 	Anonymity    bool           `gorm:"not null" json:"anonymity"`
