@@ -23,16 +23,18 @@ var DataBaseService service.DataBaseService
 var UserService service.UserService
 var AuthService service.AuthService
 var ExpressionService service.ExpressionService
+var ReviewService service.ReviewService
 
 var UserDao dao.UserDao
 var ExpressionDao dao.ExpressionDao
+var ReviewDao dao.ReviewDao
 
 var RegisterController controller.RegisterController
 var AuthController controller.AuthController
 var ProfileController controller.ProfileController
 var ExpressController controller.ExpressController
-var CommunityController controller.CommunityController
 var ReviewController controller.ReviewController
+var CommunityController controller.CommunityController
 
 func InitComponents() {
 	ConfigService = service.NewConfigService()
@@ -44,16 +46,19 @@ func InitComponents() {
 
 	UserDao = dao.NewUserDao(DataBaseService.DB)
 	ExpressionDao = dao.NewExpressionDao(DataBaseService.DB)
+	ReviewDao = dao.NewReviewDao(DataBaseService.DB)
 
 	UserService = service.NewUserService(UserDao)
 	AuthService = service.NewAuthService(UserDao)
 	ExpressionService = service.NewExpressionService(ExpressionDao)
+	ReviewService = service.NewReviewService(ReviewDao)
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
 	ProfileController = controller.NewProfileController(UserService, ExpressionService)
 	ExpressController = controller.NewExpressController(UserService, ExpressionService)
-	CommunityController = controller.NewCommunityController(UserService, ExpressionService)
+	ReviewController = controller.NewReviewController(UserService, ReviewService, ExpressionService)
+	CommunityController = controller.NewCommunityController(UserService, ExpressionService, ReviewService)
 
 	middleware.AuthService = AuthService
 }

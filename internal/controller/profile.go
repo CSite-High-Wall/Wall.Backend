@@ -65,7 +65,7 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 					"avatar_url":    displayAvatar,
 					"content":       expression.Content,
 					"title":         expression.Title,
-					"time":          expression.CreatedAt,
+					"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"),
 				})
 			}
 
@@ -73,5 +73,26 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 				"expression_list": expressionList,
 			}) // 返回成功响应
 		}
+	}
+}
+
+// 上传用户头像 Url
+func (controller ProfileController) UploadUserAvatarUrl(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var avatarUrl string
+
+	if avatar_url, isUserIdExist := c.GetQuery("avatar_url"); !isUserIdExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	} else {
+		avatarUrl = avatar_url
+	}
+
+	error := controller.userService.UploadUserAvatarUrl(userId, avatarUrl)
+
+	if error != nil {
+		utils.ResponseFailWithoutData(c, "上传用户头像 Url 失败")
+	} else {
+		utils.ResponseOkWithoutData(c)
 	}
 }

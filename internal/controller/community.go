@@ -11,12 +11,14 @@ import (
 type CommunityController struct {
 	userService       service.UserService
 	expressionService service.ExpressionService
+	reviewService     service.ReviewService
 }
 
-func NewCommunityController(userService service.UserService, expressionService service.ExpressionService) CommunityController {
+func NewCommunityController(userService service.UserService, expressionService service.ExpressionService, reviewService service.ReviewService) CommunityController {
 	return CommunityController{
 		userService:       userService,
 		expressionService: expressionService,
+		reviewService:     reviewService,
 	}
 }
 
@@ -55,9 +57,18 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 			})
 		}
 
-		utils.ResponseOk(c, gin.H{
-			"expression_list": expressionList, // 准备最终响应
-		}) // 返回成功响应，包含所有表白信息
+		if len(expressionList) == 0 {
+			var expressionList [0]gin.H
+
+			utils.ResponseOk(c, gin.H{
+				"expression_list": expressionList, // 准备最终响应
+			}) // 返回成功响应，包含所有表白信息
+		} else {
+			utils.ResponseOk(c, gin.H{
+				"expression_list": expressionList, // 准备最终响应
+			}) // 返回成功响应，包含所有表白信息
+		}
+
 	}
 }
 
@@ -96,6 +107,55 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 				"content":       expression.Content,
 				"title":         expression.Title,
 				"time":          expression.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
+			})
+		}
+	}
+}
+
+// 获取表白下的所有评论
+func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context) {
+	var expressionId uint64 = 0
+
+	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	} else {
+		expressionId, _ = strconv.ParseUint(expression_id, 10, 32)
+	}
+
+	reviews, error := controller.reviewService.FindReviewByExpressionId(expressionId)
+
+	if error != nil {
+		utils.ResponseFailWithoutData(c, "拉取表白评论失败") // 如果查询出错，返回内部服务器错误
+	} else {
+		var reviewList []gin.H
+		for _, review := range reviews {
+			user, error := controller.userService.FindUserByUserId(review.UserId)
+
+			if error != nil {
+				continue
+			}
+
+			reviewList = append(reviewList, gin.H{
+				"expression_id": review.ExpressionId,
+				"review_id":     review.ReviewId,
+				"user_id":       review.UserId,
+				"user_name":     user.UserName,
+				"avatar_url":    user.AvatarUrl,
+				"content":       review.Content,
+				"created_at":    review.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
+			})
+		}
+
+		if len(reviewList) == 0 {
+			var reviewList [0]gin.H
+
+			utils.ResponseOk(c, gin.H{
+				"review_list": reviewList, // 准备最终响应
+			})
+		} else {
+			utils.ResponseOk(c, gin.H{
+				"review_list": reviewList, // 准备最终响应
 			})
 		}
 	}

@@ -26,7 +26,7 @@ func InitRoute(r *gin.Engine) {
 		profile.GET("/user-info", middleware.AuthToken, ProfileController.GetUserInfo)
 		profile.GET("/expressions", middleware.AuthToken, ProfileController.FetchUserExpressions)
 		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
-		// profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadAvatar)
+		profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatarUrl)
 
 		// blacklist:= profile.Group("/blacklist")
 		// blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
@@ -36,6 +36,7 @@ func InitRoute(r *gin.Engine) {
 		community := api.Group("/community")
 		community.GET("/expressions", CommunityController.FetchAllExpression)
 		community.GET("/expression", CommunityController.FetchTargetedExpression)
+		community.GET("/review", CommunityController.FetchAllReviewOfExpression)
 
 		expression := api.Group("/express")
 		expression.POST("/publish", middleware.AuthToken, ExpressController.Publish)

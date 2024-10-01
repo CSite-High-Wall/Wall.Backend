@@ -29,18 +29,10 @@ type ExpressionUpdateRequestJsonObject struct {
 	Content      string `json:"content"`
 }
 
-type ExpressionDeleteRequestJsonObject struct {
-	ExpressionId uint64 `json:"expression_id"`
-}
-
 type ExpressionAllGetRequestJsonObject struct {
 	ExpressionId uint64 `json:"expression_id"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
-}
-
-type ExpressionTargetedRequestJsonObject struct {
-	ExpressionId uint64 `json:"expression_id"`
 }
 
 type ReviewCreateRequestJsonObject struct {
@@ -48,13 +40,9 @@ type ReviewCreateRequestJsonObject struct {
 	Content      string `json:"content"`
 }
 
-type ReviewDeleteRequestJsonObject struct {
-	ID uint `json:"review_id"`
-}
-
 type ReviewUpdateRequestJsonObject struct {
-	ID      uint   `json:"review_id"`
-	Content string `json:"content"`
+	ReviewId uint64 `json:"review_id"`
+	Content  string `json:"content"`
 }
 
 type BlacklistCreateRequestJsonObject struct {

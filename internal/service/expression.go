@@ -23,11 +23,11 @@ func (service ExpressionService) Publish(userId uuid.UUID, requestBody model.Exp
 }
 
 func (service ExpressionService) Edit(userId uuid.UUID, requestBody model.ExpressionUpdateRequestJsonObject) error {
-	return service.expressionDao.UpdateExpression(userId, requestBody.ExpressionId, requestBody.Content, requestBody.Title)
+	return service.expressionDao.UpdateExpression(userId, requestBody.ExpressionId, requestBody.Title, requestBody.Content)
 }
 
-func (service ExpressionService) Delete(userId uuid.UUID, requestBody model.ExpressionDeleteRequestJsonObject) error {
-	return service.expressionDao.DeleteExpression(userId, requestBody.ExpressionId)
+func (service ExpressionService) Delete(userId uuid.UUID, expressionId uint64) error {
+	return service.expressionDao.DeleteExpression(userId, expressionId)
 }
 
 func (service ExpressionService) FindExpressionByExpressionId(expressionid uint64) (model.Expression, error) {

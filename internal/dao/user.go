@@ -60,3 +60,9 @@ func (dao UserDao) UpdateLastLoginTimeOfUser(userID uuid.UUID) error {
 	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("LastLoginTime", time.Now())
 	return result.Error
 }
+
+// 更新数据库中指定用户的头像 Url
+func (dao UserDao) UpdateAvatarUrlOfUser(userID uuid.UUID, avatarUrl string) error {
+	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("AvatarUrl", avatarUrl)
+	return result.Error
+}

@@ -24,41 +24,39 @@ func (dao ReviewDao) CreateReview(UserId uuid.UUID, ExpressionId uint64, Content
 		UserId:       UserId,
 		ExpressionId: ExpressionId,
 		Content:      Content,
-		Time:         time.Now(),
 	}).Error
 	return err
 }
 
 // 删除评论
-func (dao ReviewDao) DeleteReview(UserId uuid.UUID, ReviewId uint) error {
-	err := dao.db.Where("user_id=? AND review_id=?", UserId, ReviewId).Update("DeletedAt", time.Now()).Error
+func (dao ReviewDao) DeleteReview(userId uuid.UUID, reviewId uint64) error {
+	err := dao.db.Model(&model.Review{}).Where("user_id=? AND review_id=?", userId, reviewId).Update("DeletedAt", time.Now()).Error
 	return err
 }
 
-//更新评论内容
-
-func (dao ReviewDao) UpdateReview(UserId uuid.UUID, ReviewId uint, Content string) error {
-	err := dao.db.Model(&model.Review{}).Where("user_id=? AND review_id=?", UserId, ReviewId).Updates(map[string]interface{}{
-		"content": Content,
+// 更新评论内容
+func (dao ReviewDao) UpdateReview(userId uuid.UUID, reviewId uint64, content string) error {
+	err := dao.db.Model(&model.Review{}).Where("user_id=? AND review_id=?", userId, reviewId).Updates(map[string]interface{}{
+		"content": content,
 		"time":    time.Now(),
 	}).Error
 	return err
 }
 
-// 根据表白ID查询表白，看表白是否存在
-func (dao ReviewDao) FindPostByPostId(ExpressionId uint) (model.Review, error) {
+// 根据评论 Id 查找评论
+func (dao ReviewDao) FindReviewByReviewId(reviewId uint64) (model.Review, error) {
 	var review model.Review
-	result := dao.db.First(&review, "expression_id = ?", ExpressionId)
+	result := dao.db.First(&review, "review_id = ?", reviewId)
 
 	return review, result.Error
 }
 
-// 根据评论ID查询评论，看评论是否存在
-func (dao ReviewDao) FindReviewByReviewId(ReviewId uint) (model.Review, error) {
-	var review model.Review
-	result := dao.db.First(&review, "review_id = ?", ReviewId)
+// 根据表白 Id 查找评论
+func (dao ReviewDao) FindReviewByExpressionId(expressionId uint64) ([]model.Review, error) {
+	var reviews []model.Review
+	result := dao.db.Find(&reviews, "expression_id = ?", expressionId)
 
-	return review, result.Error
+	return reviews, result.Error
 }
 
 // // 根据id和评论，看是否是本人操作

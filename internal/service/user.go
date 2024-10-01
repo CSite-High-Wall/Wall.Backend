@@ -55,3 +55,7 @@ func (service UserService) GetUserInfoByUserId(userId uuid.UUID) (interface{}, e
 		}, nil
 	}
 }
+
+func (service UserService) UploadUserAvatarUrl(userId uuid.UUID, avatarUrl string) error {
+	return service.userDao.UpdateAvatarUrlOfUser(userId, avatarUrl)
+}

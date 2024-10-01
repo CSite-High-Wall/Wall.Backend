@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -79,12 +80,14 @@ func (controller ExpressController) Edit(c *gin.Context) {
 
 // 删除表白
 func (controller ExpressController) Delete(c *gin.Context) {
-	var requestBody model.ExpressionDeleteRequestJsonObject
 	var userId = utils.ParseUserIdFromRequest(c)
+	var expressionId uint64 = 0
 
-	if err := c.BindJSON(&requestBody); err != nil || userId == uuid.Nil {
-		utils.ResponseFail(c, "无效的请求参数", err)
+	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
+	} else {
+		expressionId, _ = strconv.ParseUint(expression_id, 10, 32)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -94,13 +97,13 @@ func (controller ExpressController) Delete(c *gin.Context) {
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		expression, error := controller.expressionService.FindExpressionByExpressionId(requestBody.ExpressionId)
+		expression, error := controller.expressionService.FindExpressionByExpressionId(expressionId)
 
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取表白信息失败")
 		} else if expression.UserId != userId {
 			utils.ResponseFailWithoutData(c, "您只能删除自己的帖子") // 判断创建表白的用户和请求者是否为同一人
-		} else if error = controller.expressionService.Delete(userId, requestBody); error != nil {
+		} else if error = controller.expressionService.Delete(userId, expressionId); error != nil {
 			utils.ResponseFailWithoutData(c, "删除表白失败") // 删除表白失败
 		} else {
 			utils.ResponseOkWithoutData(c) // 返回成功相应

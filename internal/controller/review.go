@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -53,24 +54,28 @@ func (controller ReviewController) Publish(c *gin.Context) {
 
 // 删除评论接口
 func (controller ReviewController) Delete(c *gin.Context) {
-	var requestBody model.ReviewDeleteRequestJsonObject
 	var userId = utils.ParseUserIdFromRequest(c)
-	if err := c.BindJSON(&requestBody); err != nil {
+	var reviewId uint64 = 0
+
+	if review_id, isUserIdExist := c.GetQuery("review_id"); !isUserIdExist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
+	} else {
+		reviewId, _ = strconv.ParseUint(review_id, 10, 32)
 	}
+
 	_, error := controller.userService.FindUserByUserId(userId)
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		review, error := controller.reviewService.FindReviewByReviewId(requestBody.ID)
+		review, error := controller.reviewService.FindReviewByReviewId(reviewId)
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取评论信息失败")
 		} else if review.UserId != userId {
 			utils.ResponseFailWithoutData(c, "您只能删除自己的评论") // 判断创建评论的用户和请求者是否为同一人
-		} else if error = controller.reviewService.Delete(userId, requestBody); error != nil {
+		} else if error = controller.reviewService.Delete(userId, reviewId); error != nil {
 			utils.ResponseFailWithoutData(c, "删除表白失败") // 删除评论失败
 		} else {
 			utils.ResponseOkWithoutData(c) // 返回成功相应
@@ -93,11 +98,11 @@ func (controller ReviewController) Edit(c *gin.Context) {
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		review, error := controller.reviewService.FindReviewByReviewId(requestBody.ID)
+		review, error := controller.reviewService.FindReviewByReviewId(requestBody.ReviewId)
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取评论信息失败")
 		} else if review.UserId != userId {
-			utils.ResponseFailWithoutData(c, "您只能删除自己的评论") // 判断创建评论的用户和请求者是否为同一人
+			utils.ResponseFailWithoutData(c, "您只能修改自己的评论") // 判断创建评论的用户和请求者是否为同一人
 		} else if error = controller.reviewService.Edit(userId, requestBody); error != nil {
 			utils.ResponseFailWithoutData(c, "修改表白失败") // 修改评论失败
 		} else {
