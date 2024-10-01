@@ -44,11 +44,3 @@ type ReviewUpdateRequestJsonObject struct {
 	ReviewId uint64 `json:"review_id"`
 	Content  string `json:"content"`
 }
-
-type BlacklistCreateRequestJsonObject struct {
-	BeingId uuid.UUID `json:"bing_id" `
-}
-
-type BlacklistDeleteRequestJsonObject struct {
-	ID uint `json:"blacklist_id"`
-}

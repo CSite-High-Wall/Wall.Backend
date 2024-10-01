@@ -15,13 +15,13 @@ func AuthToken(c *gin.Context) {
 	authorization := c.Request.Header.Get("Authorization")
 
 	parts := strings.SplitN(authorization, " ", 2)
-	accessToken := parts[1]
 
 	if !(len(parts) == 2 && parts[0] == "Bearer") {
 		utils.ResponseFrom(c, http.StatusBadRequest, "请求头中的 Authorization 格式错误", nil)
 		return
 	}
 
+	accessToken := parts[1]
 	vaild, uuid := AuthService.VerifyAccessToken(accessToken)
 
 	if !vaild {

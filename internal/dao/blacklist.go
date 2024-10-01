@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"time"
 	"wall-backend/internal/model"
 
 	"github.com/google/uuid"
@@ -18,30 +17,31 @@ func NewBlacklistDao(db *gorm.DB) BlacklistDao {
 	}
 }
 
-func (a BlacklistDao) CreateBlacklist(UserId uuid.UUID, BeingId uuid.UUID) error {
-	err := a.db.Create(&model.Blacklist{
-		BeingId: BeingId,
-		PullId:  UserId,
-		Time:    time.Now(),
+// 根据屏蔽关系创建一个黑名单项
+func (dao BlacklistDao) CreateBlacklistItem(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	return dao.db.Create(&model.BlacklistItem{
+		OwnerUserId:   ownerUserId,
+		BlockedUserId: blockedUserId,
 	}).Error
-	return err
-
 }
 
-func (a BlacklistDao) DeleteBlacklist(UserId uuid.UUID, ID uint) error {
-	err := a.db.Where("blacklist_id=? AND pull_id=?", ID, UserId).Delete(&model.Blacklist{}).Error
+// 根据屏蔽关系删除一个黑名单项
+func (dao BlacklistDao) DeleteBlacklistItem(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	err := dao.db.Model(&model.BlacklistItem{}).Where("owner_user_id = ? AND blocked_user_id = ?", ownerUserId, blockedUserId).Delete(&model.BlacklistItem{}).Error
 	return err
 }
 
-func (a BlacklistDao) AllBlacklist() ([]model.Blacklist, error) {
-	var blacklists []model.Blacklist
-	err := a.db.Find(&blacklists).Error
+// 根据屏蔽关系查找一个黑名单项
+func (dao BlacklistDao) FindBlacklistItem(ownerUserId uuid.UUID, blockedUserId uuid.UUID) (model.BlacklistItem, error) {
+	var blacklistItem model.BlacklistItem
+	result := dao.db.First(&blacklistItem, "owner_user_id = ? AND blocked_user_id = ?", ownerUserId, blockedUserId)
+
+	return blacklistItem, result.Error
+}
+
+// 更具用户 Id 查找其黑名单
+func (dao BlacklistDao) FindBlacklistItemsByUserId(ownerUserId uuid.UUID) ([]model.BlacklistItem, error) {
+	var blacklists []model.BlacklistItem
+	err := dao.db.Find(&blacklists, "owner_user_id = ?", ownerUserId).Error
 	return blacklists, err
-}
-
-func (a BlacklistDao) FindBlacklistById(id uint) (model.Blacklist, error) {
-	var blacklist model.Blacklist
-	result := a.db.Where("blacklist_id=?", id).First(&blacklist)
-
-	return blacklist, result.Error
 }

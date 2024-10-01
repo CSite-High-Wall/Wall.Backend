@@ -2,7 +2,7 @@ package controller
 
 import (
 	"errors"
-	"wall-backend/internal/model"
+	"github.com/google/uuid"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -22,14 +22,8 @@ func NewBlacklistController(userService service.UserService, blacklistService se
 	}
 }
 
-func (controller BlacklistController) Get(c *gin.Context) {
-	var requestBody []model.Blacklist
+func (controller BlacklistController) GetBlacklistOfUser(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-
-	if error := c.BindJSON(&requestBody); error != nil {
-		utils.ResponseFailWithoutData(c, "missing parameters")
-		return
-	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
 	if errors.Is(error, gorm.ErrRecordNotFound) {
@@ -37,38 +31,48 @@ func (controller BlacklistController) Get(c *gin.Context) {
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		blacklist, err := controller.blacklistService.AllBlacklist()
+		blacklist, err := controller.blacklistService.FindBlacklistItemsByUserId(userId)
 		if err != nil {
-			utils.ResponseFail(c, "服务器内部错误，获取拉黑名单失败", nil)
+			utils.ResponseFailWithoutData(c, "服务器内部错误，获取拉黑名单失败")
 			return
 		}
+
 		var blacklistList []gin.H
-		for _, blacklist := range blacklist {
+		for _, blacklistItem := range blacklist {
+			blockedUser, error := controller.userService.FindUserByUserId(blacklistItem.BlockedUserId)
+			if error != nil {
+				continue
+			}
+
 			blacklistList = append(blacklistList, gin.H{
-				"blacklist_id": blacklist.ID,
-				"bing_id":      blacklist.BeingId,
-				"pull_id":      blacklist.PullId,
-				"time":         blacklist.Time.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式
+				"owner_user_id":           blacklistItem.OwnerUserId,
+				"blocked_user_id":         blacklistItem.BlockedUserId,
+				"blocked_user_name":       blockedUser.UserName,
+				"blocked_user_avatar_url": blockedUser.AvatarUrl,
 			})
 		}
-		// 准备最终响应
-		responseData := gin.H{
-			"blacklist_list": blacklistList,
+
+		if len(blacklist) == 0 {
+			utils.ResponseOk(c, gin.H{
+				"blacklist": [0]gin.H{}, // 准备最终响应
+			})
+		} else {
+			utils.ResponseOk(c, gin.H{
+				"blacklist": blacklistList, // 准备最终响应
+			})
 		}
-
-		// 返回成功响应，包含所有表白信息
-		utils.ResponseOk(c, responseData)
-
 	}
 
 }
 func (controller BlacklistController) Add(c *gin.Context) {
-	var requestBody model.BlacklistCreateRequestJsonObject
 	var userId = utils.ParseUserIdFromRequest(c)
+	var blockedUserId uuid.UUID = uuid.Nil
 
-	if err := c.BindJSON(&requestBody); err != nil {
+	if _blockedUserId, isUserIdExist := c.GetQuery("blocked_user_id"); !isUserIdExist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
+	} else {
+		blockedUserId, _ = uuid.Parse(_blockedUserId)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -76,44 +80,45 @@ func (controller BlacklistController) Add(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
+	} else if blockedUserId == userId {
+		utils.ResponseFailWithoutData(c, "你不能屏蔽你自己") // 检查用户
 	} else {
-		_, error := controller.userService.FindUserByUserId(requestBody.BeingId)
+		_, error := controller.userService.FindUserByUserId(blockedUserId)
+
 		if errors.Is(error, gorm.ErrRecordNotFound) {
-			utils.ResponseFailWithoutData(c, "未找到该被拉黑用户")
+			utils.ResponseFailWithoutData(c, "未找到该被屏蔽用户")
 		} else if error != nil {
-			utils.ResponseFailWithoutData(c, "获取被拉黑用户信息失败")
-		} else if error := controller.blacklistService.Add(userId, requestBody); error != nil {
-			utils.ResponseFailWithoutData(c, "拉黑失败")
+			utils.ResponseFailWithoutData(c, "获取被屏蔽用户信息失败")
+		} else if error := controller.blacklistService.Add(userId, blockedUserId); error != nil {
+			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
 		} else {
 			utils.ResponseOkWithoutData(c)
 		}
 	}
 }
-func (controller BlacklistController) Remove(c *gin.Context) {
-	var requestBody model.BlacklistDeleteRequestJsonObject
-	var userId = utils.ParseUserIdFromRequest(c)
 
-	if err := c.BindJSON(&requestBody); err != nil {
+func (controller BlacklistController) Remove(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var blockedUserId uuid.UUID = uuid.Nil
+
+	if _blockedUserId, isUserIdExist := c.GetQuery("blocked_user_id"); !isUserIdExist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
+	} else {
+		blockedUserId, _ = uuid.Parse(_blockedUserId)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
 	if errors.Is(error, gorm.ErrRecordNotFound) {
-		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
+		utils.ResponseFailWithoutData(c, "未找到该被屏蔽用户")
 	} else if error != nil {
-		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
+		utils.ResponseFailWithoutData(c, "获取被屏蔽用户信息失败")
 
 	} else {
-		blacklist, error := controller.blacklistService.FindBlacklistById(requestBody.ID)
-		if error != nil {
-			utils.ResponseFailWithoutData(c, "获取拉黑信息失败")
-		} else if blacklist.PullId != userId {
-			utils.ResponseFailWithoutData(c, "您只能取消自己的拉黑")
-		} else if error = controller.blacklistService.Remove(userId, requestBody); error != nil {
-			utils.ResponseFailWithoutData(c, "删除表白失败") // 删除评论失败
+		if error := controller.blacklistService.Remove(userId, blockedUserId); error != nil {
+			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
 		} else {
-			utils.ResponseOkWithoutData(c) // 返回成功相应
+			utils.ResponseOkWithoutData(c)
 		}
 	}
 }

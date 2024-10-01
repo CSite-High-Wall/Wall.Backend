@@ -18,7 +18,7 @@ func InitRoute(r *gin.Engine) {
 
 		authserver := api.Group("/authserver")
 		authserver.POST("/authenticate", AuthController.Authenticate)
-		authserver.POST("/refersh", AuthController.Refresh)
+		authserver.POST("/refresh", AuthController.Refresh)
 		authserver.POST("/signout", AuthController.Signout)
 		authserver.POST("/validate", AuthController.Validate)
 
@@ -28,10 +28,10 @@ func InitRoute(r *gin.Engine) {
 		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
 		profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatarUrl)
 
-		// blacklist:= profile.Group("/blacklist")
-		// blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
-		// blacklist.DELETE("/remove", middleware.AuthToken, BlacklistController.Remove)
-		// blacklist.GET("/get", middleware.AuthToken, BlacklistController.Get)
+		blacklist := profile.Group("/blacklist")
+		blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
+		blacklist.DELETE("/remove", middleware.AuthToken, BlacklistController.Remove)
+		blacklist.GET("/get", middleware.AuthToken, BlacklistController.GetBlacklistOfUser)
 
 		community := api.Group("/community")
 		community.GET("/expressions", CommunityController.FetchAllExpression)

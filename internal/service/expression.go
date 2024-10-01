@@ -30,8 +30,8 @@ func (service ExpressionService) Delete(userId uuid.UUID, expressionId uint64) e
 	return service.expressionDao.DeleteExpression(userId, expressionId)
 }
 
-func (service ExpressionService) FindExpressionByExpressionId(expressionid uint64) (model.Expression, error) {
-	return service.expressionDao.FindExpressionByExpressionId(expressionid)
+func (service ExpressionService) FindExpressionByExpressionId(expressionId uint64) (model.Expression, error) {
+	return service.expressionDao.FindExpressionByExpressionId(expressionId)
 }
 
 func (service ExpressionService) FetchAllExpression() ([]model.Expression, error) {

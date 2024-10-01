@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/google/uuid"
 	"strconv"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -12,18 +13,26 @@ type CommunityController struct {
 	userService       service.UserService
 	expressionService service.ExpressionService
 	reviewService     service.ReviewService
+	blacklistService  service.BlacklistService
 }
 
-func NewCommunityController(userService service.UserService, expressionService service.ExpressionService, reviewService service.ReviewService) CommunityController {
+func NewCommunityController(userService service.UserService, expressionService service.ExpressionService, reviewService service.ReviewService, blacklistService service.BlacklistService) CommunityController {
 	return CommunityController{
 		userService:       userService,
 		expressionService: expressionService,
 		reviewService:     reviewService,
+		blacklistService:  blacklistService,
 	}
 }
 
 // 获取所有表白
 func (controller CommunityController) FetchAllExpression(c *gin.Context) {
+	var userId uuid.UUID = uuid.Nil
+
+	if _userId, isUserIdExist := c.GetQuery("user_id"); isUserIdExist {
+		userId, _ = uuid.Parse(_userId)
+	}
+
 	expressions, err := controller.expressionService.FetchAllExpression()
 
 	if err != nil {
@@ -58,17 +67,24 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 		}
 
 		if len(expressionList) == 0 {
-			var expressionList [0]gin.H
-
 			utils.ResponseOk(c, gin.H{
-				"expression_list": expressionList, // 准备最终响应
+				"expression_list": [0]gin.H{}, // 准备最终响应
 			}) // 返回成功响应，包含所有表白信息
 		} else {
+			if userId != uuid.Nil {
+				filteredList, error := controller.blacklistService.FilterUserInBlacklist(userId, expressionList)
+
+				if error != nil {
+					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
+				} else {
+					expressionList = filteredList
+				}
+			}
+
 			utils.ResponseOk(c, gin.H{
 				"expression_list": expressionList, // 准备最终响应
 			}) // 返回成功响应，包含所有表白信息
 		}
-
 	}
 }
 
@@ -115,7 +131,11 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 // 获取表白下的所有评论
 func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context) {
 	var expressionId uint64 = 0
+	var userId uuid.UUID = uuid.Nil
 
+	if _userId, isUserIdExist := c.GetQuery("user_id"); isUserIdExist {
+		userId, _ = uuid.Parse(_userId)
+	}
 	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
@@ -131,7 +151,6 @@ func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context)
 		var reviewList []gin.H
 		for _, review := range reviews {
 			user, error := controller.userService.FindUserByUserId(review.UserId)
-
 			if error != nil {
 				continue
 			}
@@ -148,12 +167,20 @@ func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context)
 		}
 
 		if len(reviewList) == 0 {
-			var reviewList [0]gin.H
-
 			utils.ResponseOk(c, gin.H{
-				"review_list": reviewList, // 准备最终响应
+				"review_list": [0]gin.H{}, // 准备最终响应
 			})
 		} else {
+			if userId != uuid.Nil {
+				filteredList, error := controller.blacklistService.FilterUserInBlacklist(userId, reviewList)
+
+				if error != nil {
+					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
+				} else {
+					reviewList = filteredList
+				}
+			}
+
 			utils.ResponseOk(c, gin.H{
 				"review_list": reviewList, // 准备最终响应
 			})

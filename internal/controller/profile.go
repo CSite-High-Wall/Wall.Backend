@@ -69,9 +69,17 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 				})
 			}
 
-			utils.ResponseOk(c, gin.H{
-				"expression_list": expressionList,
-			}) // 返回成功响应
+			if len(expressionList) == 0 {
+				var expressionList [0]gin.H
+
+				utils.ResponseOk(c, gin.H{
+					"expression_list": expressionList, // 准备最终响应
+				}) // 返回成功响应，包含所有表白信息
+			} else {
+				utils.ResponseOk(c, gin.H{
+					"expression_list": expressionList, // 准备最终响应
+				}) // 返回成功响应，包含所有表白信息
+			}
 		}
 	}
 }

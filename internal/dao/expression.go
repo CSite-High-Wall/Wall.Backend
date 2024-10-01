@@ -43,7 +43,7 @@ func (dao ExpressionDao) UpdateExpression(userId uuid.UUID, expressionId uint64,
 
 // 删除表白
 func (dao ExpressionDao) DeleteExpression(userId uuid.UUID, expressionId uint64) error {
-	return dao.db.Where("user_id=? AND expression_id=?", userId, expressionId).Delete(&model.Expression{}).Error
+	return dao.db.Model(&model.Expression{}).Where("user_id=? AND expression_id=?", userId, expressionId).Delete(&model.Expression{}).Error
 }
 
 // 根据 ExpressionId 查找表白

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
 
@@ -17,22 +18,45 @@ func NewBlacklistService(dao dao.BlacklistDao) BlacklistService {
 	}
 }
 
-func (service BlacklistService) Add(userId uuid.UUID, requestBody model.BlacklistCreateRequestJsonObject) error {
-	return service.blacklistDao.CreateBlacklist(userId, requestBody.BeingId)
+func (service BlacklistService) Add(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	return service.blacklistDao.CreateBlacklistItem(ownerUserId, blockedUserId)
 }
 
-func (service BlacklistService) Remove(userId uuid.UUID, requestBody model.BlacklistDeleteRequestJsonObject) error {
-	return service.blacklistDao.DeleteBlacklist(userId, requestBody.ID)
+func (service BlacklistService) Remove(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	return service.blacklistDao.DeleteBlacklistItem(ownerUserId, blockedUserId)
 }
 
-func (service BlacklistService) AllBlacklist() ([]model.Blacklist, error) {
-	blacklists, err := service.blacklistDao.AllBlacklist()
-	if err != nil {
-		return nil, err
+func (service BlacklistService) FindBlacklistItemsByUserId(userId uuid.UUID) ([]model.BlacklistItem, error) {
+	return service.blacklistDao.FindBlacklistItemsByUserId(userId)
+}
+
+func (service BlacklistService) FindBlacklistItem(owner uuid.UUID, blocked uuid.UUID) (model.BlacklistItem, error) {
+	return service.blacklistDao.FindBlacklistItem(owner, blocked)
+}
+
+func (service BlacklistService) FilterUserInBlacklist(userId uuid.UUID, array []gin.H) ([]gin.H, error) {
+	blacklist, error := service.FindBlacklistItemsByUserId(userId)
+	var filteredList []gin.H
+
+	if error != nil {
+		return nil, error
 	}
-	return blacklists, nil
-}
 
-func (service BlacklistService) FindBlacklistById(id uint) (model.Blacklist, error) {
-	return service.blacklistDao.FindBlacklistById(id)
+	for _, item := range array {
+		var exist bool = false
+
+		for _, blacklistItem := range blacklist {
+			if blacklistItem.BlockedUserId == item["user_id"] {
+				exist = true
+				break
+			}
+		}
+
+		if exist == true {
+			continue
+		}
+		filteredList = append(filteredList, item)
+	}
+
+	return filteredList, nil
 }
