@@ -8,7 +8,7 @@ import (
 )
 
 type Review struct {
-	ReviewId     uint64         `json:"review_id"`
+	ReviewId     uint64         `gorm:"primaryKey;uniqueIndex;autoIncrement" json:"review_id"`
 	UserId       uuid.UUID      `json:"user_id" gorm:"type:char(36)"`
 	ExpressionId uint64         `json:"expression_id"`
 	Content      string         `json:"content"`

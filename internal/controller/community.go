@@ -28,9 +28,12 @@ func NewCommunityController(userService service.UserService, expressionService s
 // 获取所有表白
 func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 	var userId uuid.UUID = uuid.Nil
-
+	var enableTruncation bool = false
 	if _userId, isUserIdExist := c.GetQuery("user_id"); isUserIdExist {
 		userId, _ = uuid.Parse(_userId)
+	}
+	if _enableTruncation, isUserIdExist := c.GetQuery("enable_truncation"); isUserIdExist {
+		enableTruncation, _ = strconv.ParseBool(_enableTruncation)
 	}
 
 	expressions, err := controller.expressionService.FetchAllExpression()
@@ -53,6 +56,10 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 			if !expression.Anonymity {
 				displayUserName = user.UserName
 				displayAvatar = user.AvatarUrl
+			}
+
+			if enableTruncation {
+				expression.Content = utils.TruncateText(expression.Content, 200)
 			}
 
 			expressionList = append(expressionList, gin.H{
