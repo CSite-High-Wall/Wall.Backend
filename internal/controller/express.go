@@ -41,7 +41,7 @@ func (controller ExpressController) Publish(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
-	} else if utf8.RuneCountInString(requestBody.Content) > 800 {
+	} else if utf8.RuneCountInString(requestBody.Title) > 50 || utf8.RuneCountInString(requestBody.Content) > 800 {
 		utils.ResponseFailWithoutData(c, "限制的文本，文本过长") // 防过长文本
 	} else if error := controller.expressionService.Publish(userId, requestBody); error != nil {
 		utils.ResponseFailWithoutData(c, "发布表白失败")
@@ -73,7 +73,7 @@ func (controller ExpressController) Edit(c *gin.Context) {
 			utils.ResponseFailWithoutData(c, "获取表白信息失败")
 		} else if expression.UserId != userId {
 			utils.ResponseFailWithoutData(c, "您只能修改自己的帖子") // 判断创建表白的用户和请求者是否为同一人
-		} else if utf8.RuneCountInString(requestBody.Content) > 800 {
+		} else if utf8.RuneCountInString(requestBody.Title) > 50 || utf8.RuneCountInString(requestBody.Content) > 800 {
 			utils.ResponseFailWithoutData(c, "限制的文本，文本过长") // 防过长文本
 		} else if error := controller.expressionService.Edit(userId, requestBody); error != nil {
 			utils.ResponseFailWithoutData(c, "修改表白失败")
