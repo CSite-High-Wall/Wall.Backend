@@ -14,12 +14,17 @@ import (
 type ProfileController struct {
 	userService       service.UserService
 	expressionService service.ExpressionService
+	staticFsSchema    string
+	staticFsHost      string
 }
 
-func NewProfileController(userService service.UserService, expressionService service.ExpressionService) ProfileController {
+func NewProfileController(userService service.UserService, expressionService service.ExpressionService, configService service.ConfigService) ProfileController {
+	schema, host := configService.GetStaticFileSystemConfig()
 	return ProfileController{
 		userService:       userService,
 		expressionService: expressionService,
+		staticFsSchema:    schema,
+		staticFsHost:      host,
 	}
 }
 
@@ -98,7 +103,7 @@ func (controller ProfileController) UploadUserAvatar(c *gin.Context) {
 	workingDir, _ := os.Getwd()
 
 	var filename string = userId.String() + path.Ext(file.Filename)
-	var avatarUrl string = "http://" + c.Request.Host + "/api/static/avatar/" + filename
+	var avatarUrl string = controller.staticFsSchema + "://" + controller.staticFsHost + "/api/static/avatar/" + filename
 
 	if file.Size > 131072 {
 		utils.ResponseFailWithoutData(c, "不接受的文件大小")

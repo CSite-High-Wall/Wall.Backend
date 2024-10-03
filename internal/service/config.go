@@ -35,3 +35,7 @@ func (service *ConfigService) GetDataBaseConfig() model.DataBaseConfig {
 		DataBaseName: service.config.GetString("mysql.database_name"),
 	}
 }
+
+func (service *ConfigService) GetStaticFileSystemConfig() (string, string) {
+	return service.config.GetString("server.staticFs_schema"), service.config.GetString("server.staticFs_host")
+}
