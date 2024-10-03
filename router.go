@@ -27,6 +27,7 @@ func InitRoute(r *gin.Engine) {
 		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
 		profile.PUT("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatar)
 		//profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatarUrl)
+		profile.PUT("/password/edit",middleware.AuthToken,ProfileController.UpdatePassword)
 
 		blacklist := profile.Group("/blacklist")
 		blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)

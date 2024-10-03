@@ -44,3 +44,8 @@ type ReviewUpdateRequestJsonObject struct {
 	ReviewId uint64 `json:"review_id"`
 	Content  string `json:"content"`
 }
+
+type PasswordUpdateRequestJsonObject struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}

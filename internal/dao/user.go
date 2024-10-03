@@ -66,3 +66,13 @@ func (dao UserDao) UpdateAvatarUrlOfUser(userID uuid.UUID, avatarUrl string) err
 	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("AvatarUrl", avatarUrl)
 	return result.Error
 }
+
+// 更新数据库中指定用户的密码
+func (dao UserDao) UpdatePasswordOfUser(userID uuid.UUID, newPassword string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("Password", string(hash))
+	return result.Error
+}

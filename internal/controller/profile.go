@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path"
+	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -114,4 +115,22 @@ func (controller ProfileController) UploadUserAvatar(c *gin.Context) {
 	} else {
 		utils.ResponseOkWithoutData(c)
 	}
+}
+
+// 修改密码
+func (controller ProfileController) UpdatePassword(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var requestBody model.PasswordUpdateRequestJsonObject
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		utils.ResponseFail(c, "更新密码失败", err)
+		return
+	}
+
+	if err := controller.userService.UpdatePassword(userId, requestBody.OldPassword, requestBody.NewPassword); err != nil {
+		utils.ResponseFailWithoutData(c, err.Error())
+		return
+	}
+
+	utils.ResponseOkWithoutData(c)
 }
