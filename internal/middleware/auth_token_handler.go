@@ -18,6 +18,7 @@ func AuthToken(c *gin.Context) {
 
 	if !(len(parts) == 2 && parts[0] == "Bearer") {
 		utils.ResponseFrom(c, http.StatusBadRequest, "请求头中的 Authorization 格式错误", nil)
+		c.Abort()
 		return
 	}
 

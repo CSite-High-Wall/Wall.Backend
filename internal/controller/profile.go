@@ -2,6 +2,8 @@ package controller
 
 import (
 	"errors"
+	"os"
+	"path"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -84,22 +86,26 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 	}
 }
 
-// 上传用户头像 Url
-func (controller ProfileController) UploadUserAvatarUrl(c *gin.Context) {
+func (controller ProfileController) UploadUserAvatar(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var avatarUrl string
-
-	if avatar_url, isUserIdExist := c.GetQuery("avatar_url"); !isUserIdExist {
-		utils.ResponseFailWithoutData(c, "missing parameters")
-		return
-	} else {
-		avatarUrl = avatar_url
-	}
-
-	error := controller.userService.UploadUserAvatarUrl(userId, avatarUrl)
+	file, error := c.FormFile("image")
 
 	if error != nil {
-		utils.ResponseFailWithoutData(c, "上传用户头像 Url 失败")
+		utils.ResponseFailWithoutData(c, "上传头像文件失败")
+		return
+	}
+
+	workingDir, _ := os.Getwd()
+
+	var filename string = userId.String() + path.Ext(file.Filename)
+	var avatarUrl string = "http://" + c.Request.Host + "/api/static/avatar/" + filename
+
+	if file.Size > 131072 {
+		utils.ResponseFailWithoutData(c, "不接受的文件大小")
+	} else if error := c.SaveUploadedFile(file, workingDir+"/static/avatar/"+filename); error != nil {
+		utils.ResponseFailWithoutData(c, "上传头像文件失败")
+	} else if error := controller.userService.UploadUserAvatarUrl(userId, avatarUrl); error != nil {
+		utils.ResponseFailWithoutData(c, "设置用户头像失败")
 	} else {
 		utils.ResponseOkWithoutData(c)
 	}

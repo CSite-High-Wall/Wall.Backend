@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"wall-backend/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,6 @@ import (
 func InitRoute(r *gin.Engine) {
 
 	r.Use(middleware.CorsHandler)
-	r.NoMethod(middleware.NotFoundHandler)
-	r.NoRoute(middleware.NotFoundHandler)
 
 	api := r.Group("/api")
 	{
@@ -26,7 +25,8 @@ func InitRoute(r *gin.Engine) {
 		profile.GET("/user-info", middleware.AuthToken, ProfileController.GetUserInfo)
 		profile.GET("/expressions", middleware.AuthToken, ProfileController.FetchUserExpressions)
 		// profile.POST("/username/edit", middleware.AuthToken, ProfileController.EditUserName)
-		profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatarUrl)
+		profile.PUT("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatar)
+		//profile.POST("/avatar/upload", middleware.AuthToken, ProfileController.UploadUserAvatarUrl)
 
 		blacklist := profile.Group("/blacklist")
 		blacklist.POST("/add", middleware.AuthToken, BlacklistController.Add)
@@ -48,5 +48,10 @@ func InitRoute(r *gin.Engine) {
 		review.DELETE("/delete", middleware.AuthToken, ReviewController.Delete)
 		review.PUT("/edit", middleware.AuthToken, ReviewController.Edit)
 		// review.POST("/reply", middleware.AuthToken, ReviewController.Reply)
+
+		api.StaticFS("/static", http.Dir("static"))
 	}
+
+	r.NoMethod(middleware.NotFoundHandler)
+	r.NoRoute(middleware.NotFoundHandler)
 }
