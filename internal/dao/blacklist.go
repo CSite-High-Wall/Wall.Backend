@@ -45,3 +45,29 @@ func (dao BlacklistDao) FindBlacklistItemsByUserId(ownerUserId uuid.UUID) ([]mod
 	err := dao.db.Find(&blacklists, "owner_user_id = ?", ownerUserId).Error
 	return blacklists, err
 }
+
+func (dao BlacklistDao) CreateBlacklistExpression(ownerUserId uuid.UUID, expressionId uint64) error {
+	return dao.db.Create(&model.BlacklistExpression{
+		OwnerUserId:  ownerUserId,
+		ExpressionId: expressionId,
+	}).Error
+}
+
+func (dao BlacklistDao) DeleteBlacklistExpression(ownerUserId uuid.UUID, expressionId uint64) error {
+	err := dao.db.Model(&model.BlacklistExpression{}).Where("owner_user_id = ? AND expression_id = ?", ownerUserId, expressionId).Delete(&model.BlacklistExpression{}).Error
+	return err
+}
+
+func (dao BlacklistDao) FindBlacklistExpression(ownerUserId uuid.UUID, expressionId uint64) (model.BlacklistExpression, error) {
+	var blacklistExpression model.BlacklistExpression
+	result := dao.db.First(&blacklistExpression, "owner_user_id = ? AND expression_id = ?", ownerUserId, expressionId)
+
+	return blacklistExpression, result.Error
+}
+
+// 更具用户 Id 查找其黑名单
+func (dao BlacklistDao) FindBlacklistExpressionByUserId(ownerUserId uuid.UUID) ([]model.BlacklistExpression, error) {
+	var blacklists []model.BlacklistExpression
+	err := dao.db.Find(&blacklists, "owner_user_id = ?", ownerUserId).Error
+	return blacklists, err
+}

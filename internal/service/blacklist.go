@@ -1,9 +1,10 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
 	"wall-backend/internal/dao"
 	"wall-backend/internal/model"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/google/uuid"
 )
@@ -59,4 +60,20 @@ func (service BlacklistService) FilterUserInBlacklist(userId uuid.UUID, array []
 	}
 
 	return filteredList, nil
+}
+
+func (service BlacklistService) AddByExpression(ownerUserId uuid.UUID, expressionId uint64) error {
+	return service.blacklistDao.CreateBlacklistExpression(ownerUserId, expressionId)
+}
+
+func (service BlacklistService) RemoveByExpression(ownerUserId uuid.UUID, expressionId uint64) error {
+	return service.blacklistDao.DeleteBlacklistExpression(ownerUserId, expressionId)
+}
+
+func (service BlacklistService) FindBlacklistExpressionByUserId(ownerUserId uuid.UUID) ([]model.BlacklistExpression, error) {
+	return service.blacklistDao.FindBlacklistExpressionByUserId(ownerUserId)
+}
+
+func (service BlacklistService) FindBlacklistExpression(ownerUserId uuid.UUID, expressionId uint64) (model.BlacklistExpression, error) {
+	return service.blacklistDao.FindBlacklistExpression(ownerUserId, expressionId)
 }

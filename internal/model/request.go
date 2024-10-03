@@ -49,3 +49,7 @@ type PasswordUpdateRequestJsonObject struct {
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
+
+type BlacklistCreateRequestJsonObject struct {
+	ExpressionId uint64 `json:"expression_id"`
+}
