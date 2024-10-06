@@ -2,8 +2,11 @@ package controller
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"os"
 	"path"
+	"strings"
+	"unicode/utf8"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -15,15 +18,17 @@ import (
 type ProfileController struct {
 	userService       service.UserService
 	expressionService service.ExpressionService
+	authService       service.AuthService
 	staticFsSchema    string
 	staticFsHost      string
 }
 
-func NewProfileController(userService service.UserService, expressionService service.ExpressionService, configService service.ConfigService) ProfileController {
+func NewProfileController(userService service.UserService, expressionService service.ExpressionService, authService service.AuthService, configService service.ConfigService) ProfileController {
 	schema, host := configService.GetStaticFileSystemConfig()
 	return ProfileController{
 		userService:       userService,
 		expressionService: expressionService,
+		authService:       authService,
 		staticFsSchema:    schema,
 		staticFsHost:      host,
 	}
@@ -92,6 +97,36 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 	}
 }
 
+// 修改用户昵称
+func (controller ProfileController) EditNickName(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var nickName string
+
+	if nick_name, isExist := c.GetQuery("nick_name"); !isExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	} else {
+		nickName = nick_name
+	}
+
+	_, error := controller.userService.FindUserByUserId(userId)
+
+	if errors.Is(error, gorm.ErrRecordNotFound) {
+		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
+	} else if error != nil {
+		utils.ResponseFailWithoutData(c, "获取用户信息失败")
+	} else if len(strings.TrimSpace(nickName)) == 0 {
+		utils.ResponseFailWithoutData(c, "昵称不能为空串或全为空格")
+	} else if utf8.RuneCountInString(nickName) > 30 {
+		utils.ResponseFailWithoutData(c, "昵称过长")
+	} else if error := controller.userService.UpdateNickName(userId, nickName); error != nil {
+		utils.ResponseFailWithoutData(c, "修改用户昵称失败")
+	} else {
+		utils.ResponseOkWithoutData(c)
+	}
+}
+
+// 上传用户头像文件
 func (controller ProfileController) UploadUserAvatar(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
 	file, error := c.FormFile("image")
@@ -118,19 +153,25 @@ func (controller ProfileController) UploadUserAvatar(c *gin.Context) {
 }
 
 // 修改密码
-func (controller ProfileController) UpdatePassword(c *gin.Context) {
+func (controller ProfileController) ChangePassword(c *gin.Context) {
+	var requestBody model.ChangePasswordRequestJsonObject
 	var userId = utils.ParseUserIdFromRequest(c)
-	var requestBody model.PasswordUpdateRequestJsonObject
 
-	if err := c.BindJSON(&requestBody); err != nil {
-		utils.ResponseFail(c, "更新密码失败", err)
+	if err := c.BindJSON(&requestBody); err != nil || userId == uuid.Nil {
+		utils.ResponseFail(c, "无效的请求参数", err)
 		return
 	}
 
-	if err := controller.userService.UpdatePassword(userId, requestBody.OldPassword, requestBody.NewPassword); err != nil {
+	_, error := controller.userService.FindUserByUserId(userId)
+
+	if errors.Is(error, gorm.ErrRecordNotFound) {
+		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
+	} else if error != nil {
+		utils.ResponseFailWithoutData(c, "获取用户信息失败")
+	} else if err := controller.userService.UpdatePassword(userId, requestBody.OldPassword, requestBody.NewPassword); err != nil {
 		utils.ResponseFailWithoutData(c, err.Error())
-		return
+	} else {
+		controller.authService.Signout(userId)
+		utils.ResponseOkWithoutData(c)
 	}
-
-	utils.ResponseOkWithoutData(c)
 }

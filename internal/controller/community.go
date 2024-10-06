@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/google/uuid"
 	"strconv"
+	"strings"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -14,14 +15,16 @@ type CommunityController struct {
 	expressionService service.ExpressionService
 	reviewService     service.ReviewService
 	blacklistService  service.BlacklistService
+	authService       service.AuthService
 }
 
-func NewCommunityController(userService service.UserService, expressionService service.ExpressionService, reviewService service.ReviewService, blacklistService service.BlacklistService) CommunityController {
+func NewCommunityController(userService service.UserService, expressionService service.ExpressionService, reviewService service.ReviewService, blacklistService service.BlacklistService, authService service.AuthService) CommunityController {
 	return CommunityController{
 		userService:       userService,
 		expressionService: expressionService,
 		reviewService:     reviewService,
 		blacklistService:  blacklistService,
+		authService:       authService,
 	}
 }
 
@@ -29,9 +32,19 @@ func NewCommunityController(userService service.UserService, expressionService s
 func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 	var userId uuid.UUID = uuid.Nil
 	var enableTruncation bool = false
-	if _userId, isUserIdExist := c.GetQuery("user_id"); isUserIdExist {
-		userId, _ = uuid.Parse(_userId)
+
+	authorization := c.Request.Header.Get("Authorization")
+	parts := strings.SplitN(authorization, " ", 2)
+
+	if len(parts) == 2 && parts[0] == "Bearer" {
+		accessToken := parts[1]
+		valid, uuid := controller.authService.VerifyAccessToken(accessToken)
+
+		if valid {
+			userId = uuid
+		}
 	}
+
 	if _enableTruncation, isUserIdExist := c.GetQuery("enable_truncation"); isUserIdExist {
 		enableTruncation, _ = strconv.ParseBool(_enableTruncation)
 	}
@@ -50,12 +63,14 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 				continue
 			}
 
+			var displayUserId uuid.UUID = uuid.Nil
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
 
 			if !expression.Anonymity {
-				displayUserName = user.UserName
+				displayUserName = user.NickName
 				displayAvatar = user.AvatarUrl
+				displayUserId = user.UserId
 			}
 
 			if enableTruncation {
@@ -64,7 +79,7 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 
 			expressionList = append(expressionList, gin.H{
 				"expression_id": expression.ExpressionId,
-				"user_id":       expression.UserId,
+				"user_id":       displayUserId,
 				"user_name":     displayUserName,
 				"avatar_url":    displayAvatar,
 				"title":         expression.Title,
@@ -82,6 +97,9 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 				filteredList, error := controller.blacklistService.FilterUserInBlacklist(userId, expressionList)
 
 				if error != nil {
+					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
+					return
+				} else if filteredList, error = controller.blacklistService.FilterExpressionInBlacklist(userId, filteredList); error != nil {
 					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
 				} else {
 					expressionList = filteredList
@@ -114,17 +132,20 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取指定表白失败")
 		} else {
+
+			var displayUserId uuid.UUID = uuid.Nil
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
 
 			if !expression.Anonymity {
-				displayUserName = user.UserName
+				displayUserName = user.NickName
 				displayAvatar = user.AvatarUrl
+				displayUserId = user.UserId
 			}
 
 			utils.ResponseOk(c, gin.H{
 				"expression_id": expression.ExpressionId,
-				"user_id":       expression.UserId,
+				"user_id":       displayUserId,
 				"user_name":     displayUserName,
 				"avatar_url":    displayAvatar,
 				"content":       expression.Content,
@@ -166,7 +187,7 @@ func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context)
 				"expression_id": review.ExpressionId,
 				"review_id":     review.ReviewId,
 				"user_id":       review.UserId,
-				"user_name":     user.UserName,
+				"user_name":     user.NickName,
 				"avatar_url":    user.AvatarUrl,
 				"content":       review.Content,
 				"created_at":    review.CreatedAt.Format("2006-01-02 15:04:05"), // 格式化时间为易读格式

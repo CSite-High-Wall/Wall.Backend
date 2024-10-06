@@ -19,24 +19,24 @@ func NewBlacklistService(dao dao.BlacklistDao) BlacklistService {
 	}
 }
 
-func (service BlacklistService) Add(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
-	return service.blacklistDao.CreateBlacklistItem(ownerUserId, blockedUserId)
+func (service BlacklistService) AddBlacklistUserItem(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	return service.blacklistDao.CreateBlacklistUserItem(ownerUserId, blockedUserId)
 }
 
-func (service BlacklistService) Remove(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
-	return service.blacklistDao.DeleteBlacklistItem(ownerUserId, blockedUserId)
+func (service BlacklistService) RemoveBlacklistUserItem(ownerUserId uuid.UUID, blockedUserId uuid.UUID) error {
+	return service.blacklistDao.DeleteBlacklistUserItem(ownerUserId, blockedUserId)
 }
 
-func (service BlacklistService) FindBlacklistItemsByUserId(userId uuid.UUID) ([]model.BlacklistItem, error) {
-	return service.blacklistDao.FindBlacklistItemsByUserId(userId)
+func (service BlacklistService) GetUserBlacklistByUserId(userId uuid.UUID) ([]model.BlacklistUserItem, error) {
+	return service.blacklistDao.FindUserBlacklistByUserId(userId)
 }
 
-func (service BlacklistService) FindBlacklistItem(owner uuid.UUID, blocked uuid.UUID) (model.BlacklistItem, error) {
-	return service.blacklistDao.FindBlacklistItem(owner, blocked)
+func (service BlacklistService) FindBlacklistUserItem(owner uuid.UUID, blocked uuid.UUID) (model.BlacklistUserItem, error) {
+	return service.blacklistDao.FindBlacklistUserItem(owner, blocked)
 }
 
 func (service BlacklistService) FilterUserInBlacklist(userId uuid.UUID, array []gin.H) ([]gin.H, error) {
-	blacklist, error := service.FindBlacklistItemsByUserId(userId)
+	blacklist, error := service.GetUserBlacklistByUserId(userId)
 	var filteredList []gin.H
 
 	if error != nil {
@@ -62,18 +62,45 @@ func (service BlacklistService) FilterUserInBlacklist(userId uuid.UUID, array []
 	return filteredList, nil
 }
 
-func (service BlacklistService) AddByExpression(ownerUserId uuid.UUID, expressionId uint64) error {
-	return service.blacklistDao.CreateBlacklistExpression(ownerUserId, expressionId)
+func (service BlacklistService) AddBlacklistExpressionItem(ownerUserId uuid.UUID, expressionId uint64) error {
+	return service.blacklistDao.CreateBlacklistExpressionItem(ownerUserId, expressionId)
 }
 
-func (service BlacklistService) RemoveByExpression(ownerUserId uuid.UUID, expressionId uint64) error {
-	return service.blacklistDao.DeleteBlacklistExpression(ownerUserId, expressionId)
+func (service BlacklistService) RemoveBlacklistExpressionItem(ownerUserId uuid.UUID, expressionId uint64) error {
+	return service.blacklistDao.DeleteBlacklistExpressionItem(ownerUserId, expressionId)
 }
 
-func (service BlacklistService) FindBlacklistExpressionByUserId(ownerUserId uuid.UUID) ([]model.BlacklistExpression, error) {
-	return service.blacklistDao.FindBlacklistExpressionByUserId(ownerUserId)
+func (service BlacklistService) GetExpressionBlacklistByUserId(ownerUserId uuid.UUID) ([]model.BlacklistExpressionItem, error) {
+	return service.blacklistDao.FindExpressionBlacklistByUserId(ownerUserId)
 }
 
-func (service BlacklistService) FindBlacklistExpression(ownerUserId uuid.UUID, expressionId uint64) (model.BlacklistExpression, error) {
-	return service.blacklistDao.FindBlacklistExpression(ownerUserId, expressionId)
+func (service BlacklistService) FindBlacklistExpressionItem(ownerUserId uuid.UUID, expressionId uint64) (model.BlacklistExpressionItem, error) {
+	return service.blacklistDao.FindBlacklistExpressionItem(ownerUserId, expressionId)
+}
+
+func (service BlacklistService) FilterExpressionInBlacklist(userId uuid.UUID, array []gin.H) ([]gin.H, error) {
+	blacklist, error := service.GetExpressionBlacklistByUserId(userId)
+	var filteredList []gin.H
+
+	if error != nil {
+		return nil, error
+	}
+
+	for _, item := range array {
+		var exist bool = false
+
+		for _, blacklistItem := range blacklist {
+			if blacklistItem.ExpressionId == item["expression_id"] {
+				exist = true
+				break
+			}
+		}
+
+		if exist == true {
+			continue
+		}
+		filteredList = append(filteredList, item)
+	}
+
+	return filteredList, nil
 }

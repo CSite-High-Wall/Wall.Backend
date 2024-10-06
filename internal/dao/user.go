@@ -50,14 +50,20 @@ func (dao UserDao) FindUserByUserId(userId uuid.UUID) (model.User, error) {
 }
 
 // 更新数据库中指定用户的令牌标识符
-func (dao UserDao) UpdateTokenOfUser(userID uuid.UUID, token_identifier uuid.UUID) error {
-	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("TokenIdentifier", token_identifier)
+func (dao UserDao) UpdateTokenOfUser(userID uuid.UUID, tokenIdentifier uuid.UUID) error {
+	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("TokenIdentifier", tokenIdentifier)
 	return result.Error
 }
 
 // 更新数据库中指定用户的最后一次登录时间
 func (dao UserDao) UpdateLastLoginTimeOfUser(userID uuid.UUID) error {
 	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("LastLoginTime", time.Now())
+	return result.Error
+}
+
+// 更新数据库中指定用户的昵称
+func (dao UserDao) UpdateNickNameOfUser(userID uuid.UUID, nickName string) error {
+	result := dao.db.Model(model.User{}).Where("user_id = ?", userID).Update("NickName", nickName)
 	return result.Error
 }
 

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"errors"
-	"wall-backend/internal/model"
+	"strconv"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -26,7 +26,7 @@ func NewBlacklistController(userService service.UserService, blacklistService se
 	}
 }
 
-func (controller BlacklistController) GetBlacklistOfUser(c *gin.Context) {
+func (controller BlacklistController) GetUserBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -35,7 +35,7 @@ func (controller BlacklistController) GetBlacklistOfUser(c *gin.Context) {
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		blacklist, err := controller.blacklistService.FindBlacklistItemsByUserId(userId)
+		blacklist, err := controller.blacklistService.GetUserBlacklistByUserId(userId)
 		if err != nil {
 			utils.ResponseFailWithoutData(c, "服务器内部错误，获取拉黑名单失败")
 			return
@@ -68,7 +68,8 @@ func (controller BlacklistController) GetBlacklistOfUser(c *gin.Context) {
 	}
 
 }
-func (controller BlacklistController) Add(c *gin.Context) {
+
+func (controller BlacklistController) AddUserIntoBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
 	var blockedUserId uuid.UUID = uuid.Nil
 
@@ -93,7 +94,7 @@ func (controller BlacklistController) Add(c *gin.Context) {
 			utils.ResponseFailWithoutData(c, "未找到该被屏蔽用户")
 		} else if error != nil {
 			utils.ResponseFailWithoutData(c, "获取被屏蔽用户信息失败")
-		} else if error := controller.blacklistService.Add(userId, blockedUserId); error != nil {
+		} else if error := controller.blacklistService.AddBlacklistUserItem(userId, blockedUserId); error != nil {
 			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
 		} else {
 			utils.ResponseOkWithoutData(c)
@@ -101,7 +102,7 @@ func (controller BlacklistController) Add(c *gin.Context) {
 	}
 }
 
-func (controller BlacklistController) Remove(c *gin.Context) {
+func (controller BlacklistController) RemoveUserFromBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
 	var blockedUserId uuid.UUID = uuid.Nil
 
@@ -119,7 +120,7 @@ func (controller BlacklistController) Remove(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "获取被屏蔽用户信息失败")
 
 	} else {
-		if error := controller.blacklistService.Remove(userId, blockedUserId); error != nil {
+		if error := controller.blacklistService.RemoveBlacklistUserItem(userId, blockedUserId); error != nil {
 			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
 		} else {
 			utils.ResponseOkWithoutData(c)
@@ -127,57 +128,7 @@ func (controller BlacklistController) Remove(c *gin.Context) {
 	}
 }
 
-func (controller BlacklistController) AddByExpression(c *gin.Context) {
-	var userId = utils.ParseUserIdFromRequest(c)
-	var requestBody model.BlacklistCreateRequestJsonObject
-
-	if err := c.BindJSON(&requestBody); err != nil {
-		utils.ResponseFailWithoutData(c, "missing parameters")
-		return
-	}
-
-	_, error := controller.userService.FindUserByUserId(userId)
-	if errors.Is(error, gorm.ErrRecordNotFound) {
-		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
-	} else if error != nil {
-		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
-	} else {
-		_, error := controller.expressionService.FindExpressionByExpressionId(requestBody.ExpressionId)
-
-		if error != nil {
-			utils.ResponseFailWithoutData(c, "获取表白信息失败")
-		} else if error := controller.blacklistService.AddByExpression(userId, requestBody.ExpressionId); error != nil {
-			utils.ResponseFailWithoutData(c, "增加屏蔽表白失败")
-		} else {
-			utils.ResponseOkWithoutData(c)
-		}
-	}
-}
-
-func (controller BlacklistController) RemoveByExpression(c *gin.Context) {
-	var userId = utils.ParseUserIdFromRequest(c)
-	var requestBody model.BlacklistCreateRequestJsonObject
-
-	if err := c.BindJSON(&requestBody); err != nil {
-		utils.ResponseFailWithoutData(c, "missing parameters")
-		return
-	}
-
-	_, error := controller.userService.FindUserByUserId(userId)
-	if errors.Is(error, gorm.ErrRecordNotFound) {
-		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
-	} else if error != nil {
-		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
-	} else {
-		if error := controller.blacklistService.RemoveByExpression(userId, requestBody.ExpressionId); error != nil {
-			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
-		} else {
-			utils.ResponseOkWithoutData(c)
-		}
-	}
-}
-
-func (controller BlacklistController) GetBlacklistEexpression(c *gin.Context) {
+func (controller BlacklistController) GetExpressionBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -186,7 +137,7 @@ func (controller BlacklistController) GetBlacklistEexpression(c *gin.Context) {
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		blacklist, err := controller.blacklistService.FindBlacklistExpressionByUserId(userId)
+		blacklist, err := controller.blacklistService.GetExpressionBlacklistByUserId(userId)
 		if err != nil {
 			utils.ResponseFailWithoutData(c, "服务器内部错误，获取拉黑名单失败")
 			return
@@ -219,6 +170,60 @@ func (controller BlacklistController) GetBlacklistEexpression(c *gin.Context) {
 			utils.ResponseOk(c, gin.H{
 				"blacklist": blacklistList, // 准备最终响应
 			})
+		}
+	}
+}
+
+func (controller BlacklistController) AddExpressionIntoBlacklist(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var blockedExpressionId uint64
+
+	if _blockedExpressionId, isUserIdExist := c.GetQuery("blocked_expression_id"); !isUserIdExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	} else {
+		blockedExpressionId, _ = strconv.ParseUint(_blockedExpressionId, 10, 32)
+	}
+
+	_, error := controller.userService.FindUserByUserId(userId)
+	if errors.Is(error, gorm.ErrRecordNotFound) {
+		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
+	} else if error != nil {
+		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
+	} else {
+		_, error := controller.expressionService.FindExpressionByExpressionId(blockedExpressionId)
+
+		if error != nil {
+			utils.ResponseFailWithoutData(c, "获取表白信息失败")
+		} else if error := controller.blacklistService.AddBlacklistExpressionItem(userId, blockedExpressionId); error != nil {
+			utils.ResponseFailWithoutData(c, "增加屏蔽表白失败")
+		} else {
+			utils.ResponseOkWithoutData(c)
+		}
+	}
+}
+
+func (controller BlacklistController) RemoveExpressionFromBlacklist(c *gin.Context) {
+	var userId = utils.ParseUserIdFromRequest(c)
+	var blockedExpressionId uint64
+
+	if _blockedExpressionId, isUserIdExist := c.GetQuery("blocked_expression_id"); !isUserIdExist {
+		utils.ResponseFailWithoutData(c, "missing parameters")
+		return
+	} else {
+		blockedExpressionId, _ = strconv.ParseUint(_blockedExpressionId, 10, 32)
+	}
+
+	_, error := controller.userService.FindUserByUserId(userId)
+	if errors.Is(error, gorm.ErrRecordNotFound) {
+		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
+	} else if error != nil {
+		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
+	} else {
+		if error := controller.blacklistService.RemoveBlacklistExpressionItem(userId, blockedExpressionId); error != nil {
+			utils.ResponseFailWithoutData(c, "添加被屏蔽用户失败")
+		} else {
+			utils.ResponseOkWithoutData(c)
 		}
 	}
 }

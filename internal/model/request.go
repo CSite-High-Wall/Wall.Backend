@@ -45,11 +45,7 @@ type ReviewUpdateRequestJsonObject struct {
 	Content  string `json:"content"`
 }
 
-type PasswordUpdateRequestJsonObject struct {
+type ChangePasswordRequestJsonObject struct {
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
-}
-
-type BlacklistCreateRequestJsonObject struct {
-	ExpressionId uint64 `json:"expression_id"`
 }

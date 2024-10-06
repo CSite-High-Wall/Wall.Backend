@@ -23,9 +23,9 @@ func AuthToken(c *gin.Context) {
 	}
 
 	accessToken := parts[1]
-	vaild, uuid := AuthService.VerifyAccessToken(accessToken)
+	valid, uuid := AuthService.VerifyAccessToken(accessToken)
 
-	if !vaild {
+	if !valid {
 		utils.ResponseFrom(c, http.StatusUnauthorized, "未授权的验证令牌或验证令牌已过期", nil)
 		c.Abort()
 	} else {

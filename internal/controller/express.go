@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
@@ -41,6 +42,8 @@ func (controller ExpressController) Publish(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
+	} else if len(strings.TrimSpace(requestBody.Title)) == 0 {
+		utils.ResponseFailWithoutData(c, "标题不能为空串或全为空格")
 	} else if utf8.RuneCountInString(requestBody.Title) > 50 || utf8.RuneCountInString(requestBody.Content) > 800 {
 		utils.ResponseFailWithoutData(c, "限制的文本，文本过长") // 防过长文本
 	} else if error := controller.expressionService.Publish(userId, requestBody); error != nil {

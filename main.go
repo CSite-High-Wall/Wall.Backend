@@ -70,11 +70,11 @@ func InitComponents() {
 
 	RegisterController = controller.NewRegisterController(UserService)
 	AuthController = controller.NewAuthController(AuthService, UserService)
-	ProfileController = controller.NewProfileController(UserService, ExpressionService, ConfigService)
+	ProfileController = controller.NewProfileController(UserService, ExpressionService, AuthService, ConfigService)
 	ExpressController = controller.NewExpressController(UserService, ExpressionService)
 	ReviewController = controller.NewReviewController(UserService, ReviewService, ExpressionService)
-	CommunityController = controller.NewCommunityController(UserService, ExpressionService, ReviewService, BlacklistService)
-	BlacklistController = controller.NewBlacklistController(UserService, BlacklistService)
+	CommunityController = controller.NewCommunityController(UserService, ExpressionService, ReviewService, BlacklistService, AuthService)
+	BlacklistController = controller.NewBlacklistController(UserService, BlacklistService, ExpressionService)
 
 	middleware.AuthService = AuthService
 }

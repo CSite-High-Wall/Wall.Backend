@@ -36,6 +36,7 @@ func (service *DataBaseService) InitializeDataTable() error {
 		model.User{},
 		model.Expression{},
 		model.Review{},
-		model.BlacklistItem{},
+		model.BlacklistUserItem{},
+		model.BlacklistExpressionItem{},
 	)
 }
