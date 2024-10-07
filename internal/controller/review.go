@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"strconv"
 	"wall-backend/internal/model"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
@@ -17,9 +16,9 @@ type ReviewController struct {
 	reviewService     service.ReviewService
 }
 
-func NewReviewController(userService service.UserService, reviewservice service.ReviewService, expressionService service.ExpressionService) ReviewController {
+func NewReviewController(userService service.UserService, reviewService service.ReviewService, expressionService service.ExpressionService) ReviewController {
 	return ReviewController{
-		reviewService:     reviewservice,
+		reviewService:     reviewService,
 		expressionService: expressionService,
 		userService:       userService,
 	}
@@ -55,13 +54,11 @@ func (controller ReviewController) Publish(c *gin.Context) {
 // 删除评论接口
 func (controller ReviewController) Delete(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var reviewId uint64 = 0
+	exist, reviewId := utils.TryGetUInt64(c, "review_id")
 
-	if review_id, isUserIdExist := c.GetQuery("review_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		reviewId, _ = strconv.ParseUint(review_id, 10, 32)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -92,6 +89,7 @@ func (controller ReviewController) Edit(c *gin.Context) {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
 	}
+
 	_, error := controller.userService.FindUserByUserId(userId)
 	if errors.Is(error, gorm.ErrRecordNotFound) {
 		utils.ResponseFailWithoutData(c, "未找到该用户") // 检查用户

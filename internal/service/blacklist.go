@@ -104,3 +104,35 @@ func (service BlacklistService) FilterExpressionInBlacklist(userId uuid.UUID, ar
 
 	return filteredList, nil
 }
+
+func (service BlacklistService) IsInBlacklist(userId uuid.UUID, expression model.Expression) bool {
+	expressionBlacklist, error := service.GetExpressionBlacklistByUserId(userId)
+
+	if error != nil {
+		return true
+	}
+
+	for _, blacklistItem := range expressionBlacklist {
+		if blacklistItem.ExpressionId == expression.ExpressionId {
+			return true
+		}
+	}
+
+	if expression.Anonymity {
+		return false
+	}
+
+	userBlacklist, error := service.GetUserBlacklistByUserId(userId)
+
+	if error != nil {
+		return true
+	}
+
+	for _, blacklistItem := range userBlacklist {
+		if blacklistItem.BlockedUserId == expression.UserId {
+			return true
+		}
+	}
+
+	return false
+}

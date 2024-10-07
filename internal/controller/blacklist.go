@@ -2,11 +2,8 @@ package controller
 
 import (
 	"errors"
-	"strconv"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
-
-	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -71,13 +68,11 @@ func (controller BlacklistController) GetUserBlacklist(c *gin.Context) {
 
 func (controller BlacklistController) AddUserIntoBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var blockedUserId uuid.UUID = uuid.Nil
+	exist, blockedUserId := utils.TryGetUuid(c, "blocked_user_id")
 
-	if _blockedUserId, isUserIdExist := c.GetQuery("blocked_user_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		blockedUserId, _ = uuid.Parse(_blockedUserId)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -104,13 +99,11 @@ func (controller BlacklistController) AddUserIntoBlacklist(c *gin.Context) {
 
 func (controller BlacklistController) RemoveUserFromBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var blockedUserId uuid.UUID = uuid.Nil
+	exist, blockedUserId := utils.TryGetUuid(c, "blocked_user_id")
 
-	if _blockedUserId, isUserIdExist := c.GetQuery("blocked_user_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		blockedUserId, _ = uuid.Parse(_blockedUserId)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -176,13 +169,11 @@ func (controller BlacklistController) GetExpressionBlacklist(c *gin.Context) {
 
 func (controller BlacklistController) AddExpressionIntoBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var blockedExpressionId uint64
+	exist, blockedExpressionId := utils.TryGetUInt64(c, "blocked_expression_id")
 
-	if _blockedExpressionId, isUserIdExist := c.GetQuery("blocked_expression_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		blockedExpressionId, _ = strconv.ParseUint(_blockedExpressionId, 10, 32)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)
@@ -205,13 +196,11 @@ func (controller BlacklistController) AddExpressionIntoBlacklist(c *gin.Context)
 
 func (controller BlacklistController) RemoveExpressionFromBlacklist(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var blockedExpressionId uint64
+	exist, blockedExpressionId := utils.TryGetUInt64(c, "blocked_expression_id")
 
-	if _blockedExpressionId, isUserIdExist := c.GetQuery("blocked_expression_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		blockedExpressionId, _ = strconv.ParseUint(_blockedExpressionId, 10, 32)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)

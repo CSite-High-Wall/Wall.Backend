@@ -100,13 +100,11 @@ func (controller ProfileController) FetchUserExpressions(c *gin.Context) {
 // 修改用户昵称
 func (controller ProfileController) EditNickName(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var nickName string
+	exist, nickName := utils.TryGetString(c, "nick_name")
 
-	if nick_name, isExist := c.GetQuery("nick_name"); !isExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		nickName = nick_name
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)

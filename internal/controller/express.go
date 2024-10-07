@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 	"wall-backend/internal/model"
@@ -89,13 +88,11 @@ func (controller ExpressController) Edit(c *gin.Context) {
 // 删除表白
 func (controller ExpressController) Delete(c *gin.Context) {
 	var userId = utils.ParseUserIdFromRequest(c)
-	var expressionId uint64 = 0
+	exist, expressionId := utils.TryGetUInt64(c, "expression_id")
 
-	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		expressionId, _ = strconv.ParseUint(expression_id, 10, 32)
 	}
 
 	_, error := controller.userService.FindUserByUserId(userId)

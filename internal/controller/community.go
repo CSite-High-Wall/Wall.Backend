@@ -2,8 +2,6 @@ package controller
 
 import (
 	"github.com/google/uuid"
-	"strconv"
-	"strings"
 	"wall-backend/internal/service"
 	"wall-backend/pkg/utils"
 
@@ -30,24 +28,8 @@ func NewCommunityController(userService service.UserService, expressionService s
 
 // 获取所有表白
 func (controller CommunityController) FetchAllExpression(c *gin.Context) {
-	var userId uuid.UUID = uuid.Nil
-	var enableTruncation bool = false
-
-	authorization := c.Request.Header.Get("Authorization")
-	parts := strings.SplitN(authorization, " ", 2)
-
-	if len(parts) == 2 && parts[0] == "Bearer" {
-		accessToken := parts[1]
-		valid, uuid := controller.authService.VerifyAccessToken(accessToken)
-
-		if valid {
-			userId = uuid
-		}
-	}
-
-	if _enableTruncation, isUserIdExist := c.GetQuery("enable_truncation"); isUserIdExist {
-		enableTruncation, _ = strconv.ParseBool(_enableTruncation)
-	}
+	_, enableTruncation := utils.TryGetBool(c, "enable_truncation")
+	_, userId := utils.TryGetUserId(c, controller.authService)
 
 	expressions, err := controller.expressionService.FetchAllExpression()
 
@@ -101,6 +83,7 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 					return
 				} else if filteredList, error = controller.blacklistService.FilterExpressionInBlacklist(userId, filteredList); error != nil {
 					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
+					return
 				} else {
 					expressionList = filteredList
 				}
@@ -115,13 +98,12 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 
 // 获取指定表白
 func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
-	var expressionId uint64 = 0
+	valid, userId := utils.TryGetUserId(c, controller.authService)
+	exist, expressionId := utils.TryGetUInt64(c, "expression_id")
 
-	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		expressionId, _ = strconv.ParseUint(expression_id, 10, 32)
 	}
 
 	expression, err := controller.expressionService.FindExpressionByExpressionId(expressionId)
@@ -131,8 +113,9 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 		user, error := controller.userService.FindUserByUserId(expression.UserId)
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取指定表白失败")
+		} else if valid && controller.blacklistService.IsInBlacklist(userId, expression) {
+			utils.ResponseFailWithoutData(c, "你已屏蔽该表白")
 		} else {
-
 			var displayUserId uuid.UUID = uuid.Nil
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
@@ -158,17 +141,12 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 
 // 获取表白下的所有评论
 func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context) {
-	var expressionId uint64 = 0
-	var userId uuid.UUID = uuid.Nil
+	valid, userId := utils.TryGetUserId(c, controller.authService)
+	exist, expressionId := utils.TryGetUInt64(c, "expression_id")
 
-	if _userId, isUserIdExist := c.GetQuery("user_id"); isUserIdExist {
-		userId, _ = uuid.Parse(_userId)
-	}
-	if expression_id, isUserIdExist := c.GetQuery("expression_id"); !isUserIdExist {
+	if !exist {
 		utils.ResponseFailWithoutData(c, "missing parameters")
 		return
-	} else {
-		expressionId, _ = strconv.ParseUint(expression_id, 10, 32)
 	}
 
 	reviews, error := controller.reviewService.FindReviewByExpressionId(expressionId)
@@ -199,11 +177,12 @@ func (controller CommunityController) FetchAllReviewOfExpression(c *gin.Context)
 				"review_list": [0]gin.H{}, // 准备最终响应
 			})
 		} else {
-			if userId != uuid.Nil {
+			if valid {
 				filteredList, error := controller.blacklistService.FilterUserInBlacklist(userId, reviewList)
 
 				if error != nil {
 					utils.ResponseFailWithoutData(c, "拉取表白评论失败")
+					return
 				} else {
 					reviewList = filteredList
 				}
