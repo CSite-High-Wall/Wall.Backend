@@ -29,7 +29,7 @@ func NewCommunityController(userService service.UserService, expressionService s
 // 获取所有表白
 func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 	_, enableTruncation := utils.TryGetBool(c, "enable_truncation")
-	_, userId := utils.TryGetUserId(c, controller.authService)
+	valid, userId := utils.TryGetUserId(c, controller.authService)
 
 	expressions, err := controller.expressionService.FetchAllExpression()
 
@@ -49,10 +49,13 @@ func (controller CommunityController) FetchAllExpression(c *gin.Context) {
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
 
+			if !expression.Anonymity || (valid && expression.UserId == userId) {
+				displayUserId = user.UserId
+			}
+
 			if !expression.Anonymity {
 				displayUserName = user.NickName
 				displayAvatar = user.AvatarUrl
-				displayUserId = user.UserId
 			}
 
 			if enableTruncation {
@@ -120,7 +123,7 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
 
-			if !expression.Anonymity || expression.UserId == userId {
+			if !expression.Anonymity || (valid && expression.UserId == userId) {
 				displayUserId = user.UserId
 			}
 

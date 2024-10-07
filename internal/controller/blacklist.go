@@ -182,10 +182,12 @@ func (controller BlacklistController) AddExpressionIntoBlacklist(c *gin.Context)
 	} else if error != nil {
 		utils.ResponseFailWithoutData(c, "获取用户信息失败") // 检查用户
 	} else {
-		_, error := controller.expressionService.FindExpressionByExpressionId(blockedExpressionId)
+		expression, error := controller.expressionService.FindExpressionByExpressionId(blockedExpressionId)
 
 		if error != nil {
 			utils.ResponseFailWithoutData(c, "获取表白信息失败")
+		} else if expression.UserId == userId {
+			utils.ResponseFailWithoutData(c, "你不能屏蔽自己的表白")
 		} else if error := controller.blacklistService.AddBlacklistExpressionItem(userId, blockedExpressionId); error != nil {
 			utils.ResponseFailWithoutData(c, "增加屏蔽表白失败")
 		} else {
