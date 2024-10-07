@@ -120,10 +120,13 @@ func (controller CommunityController) FetchTargetedExpression(c *gin.Context) {
 			var displayUserName string = "匿名用户"
 			var displayAvatar string = ""
 
+			if !expression.Anonymity || expression.UserId == userId {
+				displayUserId = user.UserId
+			}
+
 			if !expression.Anonymity {
 				displayUserName = user.NickName
 				displayAvatar = user.AvatarUrl
-				displayUserId = user.UserId
 			}
 
 			utils.ResponseOk(c, gin.H{
