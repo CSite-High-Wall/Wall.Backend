@@ -36,3 +36,11 @@ server:
 
 ### 部署
 将项目编译到 Linux 可执行文件 `详见 build.bat` ，后上传服务器，在服务器使用 systemd 守护进程，运行服务
+
+### 贡献者
+<a href="https://github.com/CSite-High-Wall/Wall.Backend/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=CSite-High-Wall/Wall.Backend" />
+</a>
+
+  
+  
